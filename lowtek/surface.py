@@ -1,4 +1,4 @@
-from .font import Font
+from .font2 import Font
 from .colours import Colours
 from .cell import Cell
 
@@ -16,9 +16,9 @@ class Surface:
         self.pixels = memoryview(bytearray(self.font.size * self.width * self.height))
 
         init = init or Cell(" ", Colours("#000000ff", "#c0c0c0ff"))
-        self.fill(init)
         self.create_canvas_element()
-        self.update_canvas()
+        self.fill(init)
+        #self.update_canvas()
 
     @property
     def pixel_width(self):
@@ -53,15 +53,11 @@ class Surface:
 
         
     def fill(self, cell):
-        cpixels = self.font.render_glyph(cell)
+        glyph = self.font.render_glyph(cell)
         for y in range(self.height):
             for x in range(self.width):
-                self.write(cpixels, x, y)
+                self.write(glyph, x, y)
 
-    def write(self, pixels, x, y):
-        for fy in range(self.font.height):
-            spos = y*self.font.size*self.width + x*self.font.xsize + fy*self.font.xsize*self.width
-            fpos = fy*self.font.xsize
-            self.pixels[spos:spos+self.font.xsize] = pixels[fpos:fpos+self.font.xsize]
-
+    def write(self, glyph, x, y):
+        self.ctx.drawImage(glyph, x*self.font.width, y*self.font.height)
     

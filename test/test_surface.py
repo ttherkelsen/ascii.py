@@ -1,4 +1,4 @@
-from lowtek.surface2 import Surface
+from lowtek.surface import Surface
 from lowtek.cell import Cell
 from lowtek.colours import Colours
 import js

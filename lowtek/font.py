@@ -1,4 +1,8 @@
 import pickle, os.path
+from pyscript.web import elements
+import js
+from pyscript import ffi
+
 FONT_PATH = "./resource/font/"
 
 class Font:
@@ -49,6 +53,14 @@ class Font:
                 pixels[pos:pos+4] = colour
                 row >>= self.depth
 
-        self.cache[glyph][cell.colours] = pixels
-        return pixels
+        canvas = elements.canvas()._dom_element
+        canvas.width = self.width
+        canvas.height = self.height
+        ctx = canvas.getContext("2d")
+        data = js.Uint8ClampedArray.new(ffi.to_js(pixels))
+        image_data = js.ImageData.new(data, self.width, self.height)
+        ctx.putImageData(image_data, 0, 0)
+                
+        self.cache[glyph][cell.colours] = canvas
+        return canvas
     
