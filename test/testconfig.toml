@@ -1,0 +1,15 @@
+"sync_main_only" = true
+"experimental_create_proxy" = "auto"
+
+[files]
+"{LIB}" = "http://localhost/lowtek"
+"{RES}" = "http://localhost/resource"
+"{LIB}/__init__.py" = "./lowtek/"
+"{LIB}/test.py" = "./lowtek/"
+"{LIB}/font.py" = "./lowtek/"
+"{LIB}/font2.py" = "./lowtek/"
+"{LIB}/cell.py" = "./lowtek/"
+"{LIB}/colours.py" = "./lowtek/"
+"{LIB}/surface.py" = "./lowtek/"
+"{LIB}/surface2.py" = "./lowtek/"
+"{RES}/font/ucs_9x15.pickle" = "./resource/font/"

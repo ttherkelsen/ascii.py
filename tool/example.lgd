@@ -1,0 +1,45 @@
+;
+; This is an example file describing the Lowtek Glyph Data format.
+;
+; Any white space at the start or end of a line is ignored.
+; Empty lines are ignored.
+; Comments start with the ";" character and end with newline.
+;
+; Blocks start with the ":" character and end with an empty line.
+; Every block defines a glyph.  The special block "__core__" is
+; be used to define global values, such as glyph width/height.
+;
+; The first line of a normal block must be a number defining the
+; hexadecimal code point of the glyph.  It is recommended to stick with
+; unicode numbering convention.
+; The rest of the lines in the block defines rows of pixels for
+; the given glyph, each pixel using the colour index as specified by
+; the palette chracters.
+;
+; All glyphs must be the same size.
+
+
+:__core__
+name Example Multi-colour Glyphs ; the name of the set of glyphs defined by this file.
+size 9x15 ; width x height of the all glyphs defined by the file.
+depth 3 ; the bit depth of the font, eg., 3 means 2**3 different colours are possible in each glyph
+palette . # a b c d e f ; the characters that represent the different colour indexes
+
+
+:unknown
+0
+.........
+.#######.
+.a.....a.
+.b.....b.
+......c..
+......d..
+.....e...
+.....f...
+....e....
+....d....
+.........
+....c....
+....b....
+.........
+.........
