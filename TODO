@@ -1,2 +1,10 @@
 TODO:
 - Do pythonic type hints
+- bdf2lgf conversion tool
+- test of fonts with depth > 1 (multicolour)
+- (re)implement current Ascii.js classes
+
+DONE:
+- PyScript basic setup
+- Lowlevel font glyph rendering implemented (Font + Surface classes)
+- Performance test font rendering; pyscript wasm bridge vs keeping everything in pure python (wasm bridge won)

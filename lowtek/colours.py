@@ -1,6 +1,9 @@
+import utils
+
+@utils.memoize_args
 class Colours:
     def __init__(self, *colours):
-        self.colours = tuple([ Colours.to_memoryview(t) for t in colours ])
+        self.colours = ( Colours.to_memoryview(t) for t in colours )
 
     def __hash__(self):
         return hash(self.colours)
