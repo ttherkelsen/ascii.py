@@ -4,14 +4,15 @@ import js
 
 def run(*args):
     screen = UI.Screen(
-        surface = Surface('canvas', 'ucs_9x15', 80, 40),
+        surface = Surface(jsid = 'canvas', fontname = 'ucs_9x15', width = 80, width = 40),
         theme = UI.LightTheme(),
-        ui = UI.RowContainer(
+        ui = UI.Container(
+            layout = UI.layout.Rows()
             children = [
-                UI.Label( text = "Row 1" ),
-                UI.Label( text = "Row 23" ),
-                UI.Label( text = "Row 35555" ),
-                UI.Label( text = "Row 4" ),
+                UI.Label(text = "Row 1"),
+                UI.Label(text = "Row 23"),
+                UI.Label(text = "Row 35555"),
+                UI.Label(text = "Row 4"),
             ],
         ),
     )

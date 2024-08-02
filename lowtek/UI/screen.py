@@ -16,6 +16,7 @@ class Screen:
         self.theme = theme
         self.ui = ui
 
+        self.ui._screen = self
         self.surface.set_event_callback(self)
         self.init()
 
