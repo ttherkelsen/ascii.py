@@ -1,5 +1,5 @@
 from .Component import Border, Rect
-
+from argparse import Namespace
 
 class Cell:
     def __init__(self, glyph, colours):
@@ -12,6 +12,17 @@ class CellUpdate:
 
 
 class LineDrawing:
+    """FIXME: Simplify this by turning it into a dict of frozenset keys:
+    LD_CHARS = {
+        frozenset("N"): 0x2551,
+        frozenset("n"): 0x2502,
+        ...etc...
+    }
+    That way you can get at the keys with LD_CHARS[frozenset("WEs")] and have
+    easy support for single, double and single+double line drawing characters, and
+    other characters could be used to support the other types of line drawing
+    (dotted lines, fat lines, curved corners, etc)
+    """
     LD_CHARS = (
         # Single
         #  0        1       2       3       4       5       6       7       8       9
@@ -41,14 +52,39 @@ class LineDrawing:
             o |= getattr(cls, edge)
         return cls.LD_CHARS[char_type][0]
 
+class CellsCollection:
+    def __init__(self):
+        self.cc = None
+        self.updates = None
 
+    @property
+    def initialised(self):
+        return self.cc is not None
+
+    def add_cells(self, name, cells):
+        if self.cc is None:
+            self.cc = Namespace()
+        self.cc.name = cells
+
+class CellsType(Enum):
+    LINE = auto()
+    FRAME = auto()
+    BOX = auto()
+        
 class Cells:
-    def __init__(self, cells, w, h, x=0, y=0):
+    def __init__(self, cells, w=None, h=None, x=0, y=0, t=CellsType.BOX):
+        # FIXME: Add checking for w and h based on what t is
         self.cells = cells
         self.w = w
         self.h = h
         self.x = 0
         self.y = 0
+        self.t = t
+        # set of (x, y) tuples of cell coordinates that have updates since last call to render
+        # if None, means the cells have not been rendered yet and thus all cells need to be
+        # rendered.  Empty set() means cells have been rendered at least once but have not
+        # changed since last render and thus nothing needs to be rendered.
+        self.updates = None
 
 
     def translate(self, x=0, y=0):
@@ -107,6 +143,7 @@ class Cells:
                 self.cells[y+oy][x+ox] = other.cells[oy][ox]
 
 
+    @classmethod
     def fill(cls, char, colours, w, h):
         return cls([ [ Cell(char, colours) for t in range w ] for u in range h ], w, h)
     

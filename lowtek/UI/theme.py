@@ -1,4 +1,4 @@
-from types import SimpleNamespace
+from argparse import Namespace
 from ..colours import Colours
 
 class Theme:
@@ -6,7 +6,7 @@ class Theme:
 
 class LightTheme(Theme):
     def __init__(self):
-        self.colours = SimpleNamespace(
+        self.colours = Namespace(
             text = Colours("#c0c0c0ff", "#333333ff"),
             padding = Colours("#c0c0c0ff", "#333333ff"),
             margin = Colours("#c0c0c0ff", "#333333ff"),
@@ -19,7 +19,7 @@ class LightTheme(Theme):
         
 class DarkTheme(Theme):
     def __init__(self):
-        self.colours = SimpleNamespace(
+        self.colours = Namespace(
             text = Colours("#000000ff", "#f0f0f0ff"),
             padding = Colours("#000000ff", "#f0f0f0ff"),
             margin = Colours("#000000ff", "#f0f0f0ff"),
