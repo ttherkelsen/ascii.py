@@ -14,6 +14,8 @@ def toggle_debug(mode=None):
 
         
 def debug(*args, **kwargs):
+    # FIXME: Apparently print() if you don't have a tag with terminal attrib on it works like console.log()
+    # without the need to use to_js()
     global __DEBUG__
     
     if not __DEBUG__:

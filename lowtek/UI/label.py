@@ -6,5 +6,6 @@ class Label(Component):
     def __init__(self, text, **component):
         super().__init__(**component)
         self.text = text
-        self.cells = Cells.from_str(text, self._screen.theme.colours.text) 
+        self.cells.main = Cells.from_str(text, self._screen.theme.colours.text) 
         # FIXME: Support passing an array of cells in text argument?
+        # FIXME: Trigger re-layout if text is changed

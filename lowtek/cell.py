@@ -52,25 +52,33 @@ class LineDrawing:
             o |= getattr(cls, edge)
         return cls.LD_CHARS[char_type][0]
 
+
 class CellsCollection:
     def __init__(self):
-        self.cc = None
         self.updates = None
 
     @property
     def initialised(self):
         return self.cc is not None
 
+    def get_cells(self):
+        for k, v in self.__dict__.items():
+            if not isinstance(v, Cells):
+                continue
+            yield v
+    
     def add_cells(self, name, cells):
         if self.cc is None:
             self.cc = Namespace()
-        self.cc.name = cells
+        setattr(self.cc, name, cells)
+
 
 class CellsType(Enum):
-    LINE = auto()
-    FRAME = auto()
+    LINE = auto()  # A single line of cells (either horizontal or vertical)
+    FRAME = auto() # A rectangular 
     BOX = auto()
-        
+
+
 class Cells:
     def __init__(self, cells, w=None, h=None, x=0, y=0, t=CellsType.BOX):
         # FIXME: Add checking for w and h based on what t is
@@ -80,6 +88,7 @@ class Cells:
         self.x = 0
         self.y = 0
         self.t = t
+        
         # set of (x, y) tuples of cell coordinates that have updates since last call to render
         # if None, means the cells have not been rendered yet and thus all cells need to be
         # rendered.  Empty set() means cells have been rendered at least once but have not
@@ -93,6 +102,7 @@ class Cells:
         
 
     def truncate(self, w, h):
+        # FIXME
         if h < self.h:
             del self.cells[h:]
             self.h = h
@@ -147,7 +157,11 @@ class Cells:
     def fill(cls, char, colours, w, h):
         return cls([ [ Cell(char, colours) for t in range w ] for u in range h ], w, h)
     
-        
+
+    @classmethod
+    def frame(cls, size, rect, char, colours):
+        pass
+    
     @classmethod
     def from_str(cls, string, colours):
         # FIXME: Add support for newlines in string?
