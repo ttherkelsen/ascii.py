@@ -2,13 +2,8 @@ import .utils
 
 # Important note: Screen is not a component -- you cannot have a screen
 # inside a screen; it will always be the top node of your UI hierarchy.
-# Screen's purposes is to act as a bridge between Components (that know
-# nothing about how things are rendered graphically) and a Surface (which
-# only knows how to render things graphically).
-# This abstraction exists so that it is possible to replace both
-# Component and Surface with other systems without (for example using a
-# surface that uses HTML DOM instead of Canvas2D) having to redo the
-# entire application.
+# Screen's purpose is to define a discrete area of the browser window
+# and to capture and forward HTML DOM events to the UI.
 
 class Screen:
     def __init__(self, surface, theme, ui):
