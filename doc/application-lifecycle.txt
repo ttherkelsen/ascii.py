@@ -1,0 +1,62 @@
+Application inputs:
+- HTML id of div tag to use (assumption is application is embedded in
+  a larger webpage, though this is not a requirement)
+
+- Instantiated Screen object containing, amongst other things, a
+  hierarchy of Components (starting with a root Container)
+
+
+Initialisation:
+
+1) Create background <canvas> tag inside the div tag with the id
+specified, also set CSS styles as appropriate (height, width,
+position: relative, z-index: 0).  The size of this canvas depends on
+the Font and cell size given in the Screen object.  The canvas is
+initially filled with a colour (default 0% alpha channel black) or a
+Font glyph.
+
+2) Call render() on specified Screen object
+
+
+Screen Render:
+
+1) Test if layout is needed (either because none has ever been done,
+or because a Component has requested a new layout), if not skip to 9.
+
+2) Call root.layout(size)
+
+3) Each layout() method recursively (depth first) calls each child to
+ask what size it wants, specifying the max size it can have without
+scrolling.
+
+4) Once every Container has collected size requests from each child,
+it will assign sizes and positions to each child based on the layout
+manager chosen (eg., the row layout manager will create one row per
+child)
+
+5) Call root.layout_html(div, size)
+
+6) Delete any HTML objects the Component may have created (future
+optimisation: only delete if layout has changed since last call to
+layout_html)
+
+6) Create child <div> tag, set CSS styles (height, width, position:
+absolute, top, left, z-index: 0) as appropriate.  z-index will always
+be 0 because <div> nesting from Containers takes care of stacking, and
+within a Container you will never have overlapping Components (FIXME:
+What about windows?)
+
+7) Create <canvas> tag with the size specified, fill with 0% alpha
+channel black.  Add canvas to div tag.
+
+8) Add div tag to specified parent div tag
+
+9) Call root.render()
+
+10) Update the canvas created in 7) according to the Component's Cells
+(future optimisation: only update canvas with changed Cells since last
+call to render())
+
+
+
+
