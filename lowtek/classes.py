@@ -30,6 +30,12 @@ class Size:
     def expand_1(self, rect):
         self.w += (rect.e and 1) + (rect.w and 1)
         self.h += (rect.n and 1) + (rect.s and 1)
+
+
+class Position:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
         
         
 class BBox:

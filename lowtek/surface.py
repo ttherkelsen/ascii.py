@@ -1,4 +1,4 @@
-from .font2 import Font
+from .font import Font
 from .colours import Colours
 from .cell import Cell
 
@@ -9,18 +9,19 @@ import js
 #FIXME: Destroy method?
 
 class Surface:
-    def __init__(self, js_id_or_div, font_name, width, height, init=None):
+    def __init__(self, js_id_or_div, font_name, width, height, init=None, pos=None):
         if isinstance(js_id_or_div, str):
-            self.div = dom.find(f"#{js_id_or_div}")[0]
+            self.parent_div = dom.find(f"#{js_id_or_div}")[0]
         else:
-            self.div = js_id_or_div
+            self.parent_div = js_id_or_div
         self.js_id_or_div = js_id_or_div
         self.font_name = font_name
         self.width = width
         self.height = height
         self.font = Font.load(font_name)
+        self.pos = pos
 
-        self.create_canvas_element()
+        self.create_dom_elements()
         if init is None:
             self.colour_fill("#000000")
         else:
@@ -34,8 +35,8 @@ class Surface:
     def pixel_height(self):
         return self.height * self.font.height
 
-    def create_canvas_element(self):
-        # Create canvas tag and add it to the self.div element
+    def create_dom_elements(self):
+        # Create div and canvas tag and add it to the self.parent_div element
         canvas = elements.canvas(
             style = {
                 'width': f"{self.pixel_width}px",
@@ -44,7 +45,22 @@ class Surface:
         )
         canvas._dom_element.width = self.pixel_width
         canvas._dom_element.height = self.pixel_height
+        
+        style = {
+            'width': f"{self.pixel_width}px",
+            'height': f"{self.pixel_height}px",
+            'z-index': '0',
+        }
+        if self.pos is None:
+            style['position'] = 'relative'
+        else:
+            style['position'] = 'absolute'
+            style['top'] = f"{self.pos.y}px"
+            style['left'] = f"{self.pos.x}px"
+            
+        self.div = elements.div(style=style)
         self.div.append(canvas)
+        self.parent_div.append(self.div)
         
         # Keep local proxy of canvas 2d context
         self.ctx = canvas._dom_element.getContext("2d")
