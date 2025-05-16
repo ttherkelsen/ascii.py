@@ -1,12 +1,11 @@
 import pickle, os.path
-from pyscript.web import elements
 import js
 from pyscript import ffi
 
 FONT_PATH = "./resource/font/"
 
 class Font:
-    self.cache = {} # shared amongst all instances
+    cache = {} # shared amongst all instances
     
     def __init__(self, name, width, height, depth, glyphs, unknown=0):
         self.name = name

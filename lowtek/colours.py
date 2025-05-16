@@ -1,9 +1,11 @@
-import utils
+from . import utils
 
-@utils.memoize_args
+# Fixme: Find way to make it so that for a given list of colours, the resulting
+# Colours object is always a singleton
+
 class Colours:
     def __init__(self, *colours):
-        self.colours = ( Colours.to_memoryview(t) for t in colours )
+        self.colours = tuple([ Colours.to_memoryview(t) for t in colours ])
 
     def __hash__(self):
         return hash(self.colours)

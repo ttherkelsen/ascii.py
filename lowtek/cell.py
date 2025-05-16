@@ -1,4 +1,5 @@
-from .Component import Border, Rect
+from enum import Enum, auto
+from .classes import Rect
 from argparse import Namespace
 
 class Cell:
@@ -45,7 +46,7 @@ class LineDrawing:
     W = 4
     S = 8
     
-    @classmethod()
+    @classmethod
     def get_char(cls, edges_open, char_type):
         o = 0
         for edge in edges_open:
@@ -155,7 +156,7 @@ class Cells:
 
     @classmethod
     def fill(cls, char, colours, w, h):
-        return cls([ [ Cell(char, colours) for t in range w ] for u in range h ], w, h)
+        return cls([ [ Cell(char, colours) for t in range(w) ] for u in range(h) ], w, h)
     
 
     @classmethod
