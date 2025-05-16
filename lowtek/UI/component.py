@@ -1,5 +1,5 @@
 from enum import Enum, auto, IntFlag
-from cell import CellsCollection
+from .cell import CellsCollection
 from lowtek import const
 from lowtek.classes import Rect, Size
 
@@ -13,7 +13,7 @@ class Component:
             title   = None,             # should a title be displayed at the top of the component?
             margin  = None,             # Exterior space around component
             padding = None,             # Interior space around component content
-            sizing  = const.Sizing.MAX, # True/False; component takes up as much/little space as possible
+            sizing  = const.Sizing.MAX, # How should component size itself (MAX/MIN)
     ):
         self.align = align
         self.valign = valign
@@ -22,6 +22,10 @@ class Component:
         self.margin = margin
         self.padding = padding
         self.cells = CellsCollection()
+
+
+    def update_screen(self, screen):
+        self._screen = screen
 
     @property
     def component_size:
@@ -50,7 +54,7 @@ class Component:
         return Size(w=w, h=h)
     
         
-    def layout_hint(self, width, height):
+    def layout_hint(self, size):
         """
         Called from parent component (usually a Container) with the max width & height that the
         component is allowed.

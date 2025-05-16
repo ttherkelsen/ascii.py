@@ -9,3 +9,4 @@ class Label(Component):
         self.cells.main = Cells.from_str(text, self._screen.theme.colours.text) 
         # FIXME: Support passing an array of cells in text argument?
         # FIXME: Trigger re-layout if text is changed
+

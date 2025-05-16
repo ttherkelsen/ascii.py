@@ -3,51 +3,26 @@ import .utils
 # Important note: Screen is not a component -- you cannot have a screen
 # inside a screen; it will always be the top node of your UI hierarchy.
 # Screen's purpose is to define a discrete area of the browser window
-# and to capture and forward HTML DOM events to the UI.
+# to be used for Components and to capture and forward HTML DOM events
+# (mouse and keyboard) to the UI.
 
 class Screen:
-    def __init__(self, surface, theme, ui):
-        self.surface = surface
+    def __init__(self, size, jsid, theme, ui):
+        self.size = size
+        self.jsid = jsid
         self.theme = theme
         self.ui = ui
+        
+        self.ui.update_screen(self)
+        self.surface = Surface(jsid, size, theme.font_name, Cell(self.theme.background, self.theme.colours.text))
+        self.layout_required = True
 
-        self.ui._screen = self
-        self.surface.set_event_callback(self)
-        self.init()
-
-    def surface_event(self, event, data):
-        if self.ui.mouse_event(event, data):
-            # Mouse event caused a component to change, do another render cycle
-            self.render()
-
-    def init(self):
-        self.cells = [
-            Cell(self.theme.background, self.theme.colours.text) for t in range(self.surface.width * self.surface.height)
-        ]
-        self.render_cells()
-
-    def render_cells(self):
-        # FIXME: This should be generalised/optimised to only render the parts of
-        # the screen that actually changed, not the entire screen
-        self.surface.write_cells(0, 0, self.cells)
-
-    def update_cells(self, update):
-        x = update.x
-        y = update.y
-
-        if 0 > x > self.surface.width or 0 > y > self.surface.height:
-            utils.debug("update_cells called with illegal x or y", x, y)
-            return
-
-        ox = x
-        for cell in update.cells:
-            self.cells[y * self.surface.width + x] = cell
-            x += 1
-            if ((ox - x) == update.w):
-                x = ox;
-                y += 1
-
+    def layout(self):
+        self.ui.layout_hint(self.size)
+        self.ui.layout_done(self.surface, self.size.to_bbox())
+        
     def render(self):
-        for update in self.ui.render(self.surface.width, self.surface.height, self.theme):
-            self.update_cells(update)
-        self.render_cells()
+        if self.layout_required:
+            self.layout()
+            
+        self.ui.render()

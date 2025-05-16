@@ -63,8 +63,13 @@ class Surface:
         # Keep local proxy of canvas 2d context
         self.ctx = canvas._dom_element.getContext("2d")
 
-    def add_child(self, font, size, pos, init=None):
-        child = Surface(self.div, font, size, init, pos.to_pixels(Size(self.font.width, self.font.height)))
+    def add_child(self, bbox, init=None, font_name=None):
+        if font_name is None:
+            font_name = self.font_name
+        child = Surface(
+            self.div, font_name, bbox.to_size(), init,
+            bbox.to_position().to_pixels(Size(self.font.width, self.font.height))
+        )
         return child
         
     def colour_fill(self, colour):
@@ -80,4 +85,5 @@ class Surface:
     def write(self, cell, x, y):
         glyph = self.font.render_glyph(cell)
         self.ctx.putImageData(glyph, x*self.font.width, y*self.font.height)
+    
     

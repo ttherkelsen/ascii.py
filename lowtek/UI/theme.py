@@ -15,6 +15,7 @@ class LightTheme(Theme):
             button_hover = Colours("#30c0c0ff", "#000000ff"),
             )
         self.background = " "
+        self.font_name = "ucs_9x15"
 
         
 class DarkTheme(Theme):
@@ -28,4 +29,5 @@ class DarkTheme(Theme):
             button_hover = Colours("#30c0c0ff", "#000000ff"),
             )
         self.background = " "
+        self.font_name = "ucs_9x15"
 

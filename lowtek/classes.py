@@ -23,6 +23,13 @@ class Size:
 
         return Size(self.w + other.w, self.h + other.h)
 
+    def __sub__(self, other):
+        if other is not Size:
+            return NotImplemented
+
+        return Size(abs(self.w - other.w), abs(self.h - other.h))
+
+    
     def expand(self, rect):
         self.w += rect.e + rect.w
         self.h += rect.n + rect.s
@@ -31,6 +38,9 @@ class Size:
         self.w += (rect.e and 1) + (rect.w and 1)
         self.h += (rect.n and 1) + (rect.s and 1)
 
+    def to_bbox(self, x=0, y=0):
+        return BBox(x, y, self.w, self.h)
+        
 
 class Position:
     def __init__(self, x, y):
@@ -48,3 +58,10 @@ class BBox:
         self.y = y
         self.w = w
         self.h = h
+
+    def to_size(self):
+        return Size(self.w, self.h)
+
+    def to_position(self):
+        return Position(self.x, self.y)
+    
