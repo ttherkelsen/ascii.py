@@ -1,34 +1,31 @@
 from enum import Enum, auto, IntFlag
-from .cell import CellsCollection
-from lowtek import const
-from lowtek.classes import Rect, Size
+from ..cell import CellUpdates
+from .. import const
+from ..classes import Rect, Size
 
 class Component:
     """Every UI component should have Component as (one of) its base class(es)."""
     def __init__(
-            /, self, *,
+            self, /, *,
             align   = const.Align.LEFT, # horizontal alignment of component
             valign  = const.Align.TOP,  # vertical alignment of component
             border  = None,             # should a border be drawn around the component?
-            title   = None,             # should a title be displayed at the top of the component?
             margin  = None,             # Exterior space around component
             padding = None,             # Interior space around component content
             sizing  = const.Sizing.MAX, # How should component size itself (MAX/MIN)
+            bbox    = None,             # Used by some layout managers
     ):
         self.align = align
         self.valign = valign
         self.border = border
-        self.title = title
         self.margin = margin
         self.padding = padding
-        self.cells = CellsCollection()
-
-
-    def update_screen(self, screen):
-        self._screen = screen
+        self.sizing = sizing
+        self.bbox = bbox
+        self.cells = CellUpdates()
 
     @property
-    def component_size:
+    def component_size(self):
         """Return combined size of everything except component content cells (borders, margin, padding, etc)"""
         h = 0
         w = 0
@@ -52,7 +49,14 @@ class Component:
             w += self.padding.e + self.padding.w
 
         return Size(w=w, h=h)
-    
+
+
+    def update(self, name, value):
+        try:
+            return getattr(self, f'update_{name}')(value)
+        except AttributeError:
+            pass
+        setattr(self, name, value)
         
     def layout_hint(self, size):
         """
@@ -66,7 +70,7 @@ class Component:
         return Size(w=self.cells.main.w, h=self.cells.main.h) + self.component_size
 
         
-    def layout_done(self, bbox):
+    def layout_done(self, bbox): 
         """
         Called from parent component (usually a Container) with the bounding box (x, y, width and height,
         usually x = y = 0) that this component must render inside.
@@ -106,6 +110,5 @@ class Component:
 
 
     def render(self):
-        pass
-
+        return self.cells
 

@@ -1,4 +1,4 @@
-class Row:
+class Flat:
     """
     Arrange children in rows, one child per row.
     """

@@ -4,18 +4,15 @@ import js
 
 def run(*args):
     screen = UI.Screen(
-        size = Size(80, 40),
-        jsid = 'canvas',
+        surface = Surface('canvas', 'ucs_9x15', Size(80, 40)),
         theme = UI.LightTheme(),
-        ui = UI.Container(
-            layout = UI.layout.Rows()
-            children = [
-                UI.Label(text = "Row 1"),
-                UI.Label(text = "Row 23"),
-                UI.Label(text = "Row 35555"),
-                UI.Label(text = "Row 4"),
-            ],
-        ),
+        ui = [
+            UI.Window(
+                title = "Test",
+                position = Position(3, 3),
+                size = Size(10, 10),
+            )
+        ],
     )
     screen.render()
 

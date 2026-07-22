@@ -7,10 +7,80 @@ class Cell:
         self.glyph = glyph if isinstance(glyph, int) else ord(glyph)
         self.colours = colours
 
+class CellPosition:
+    def __init__(self, cell, x, y):
+        self.cell = cell
+        self.x = x
+        self.y = y
+
         
 class CellUpdate:
-    pass
+    def __init__(self, cells):
+        self.cells = cells
+        self.dirty = True
 
+    def __iter__(self):
+        if not self.dirty:
+            return
+        for cp in self.iter():
+            yield cp
+        self.dirty = False
+
+class CellUpdateBBox(CellUpdate):
+    def __init__(self, cells, bbox):
+        super().__init__(cells)
+        self.bbox = bbox
+
+    def iter(self):
+        idx = 0
+        for yy in range(self.bbox.h):
+            for xx in range(self.bbox.w):
+                yield CellPosition(self.cells[idx], self.bbox.x + xx, self.bbox.y + yy)
+                idx += 1
+
+class CellUpdateBBoxFill(CellUpdateBBox):
+    def iter(self):
+        for yy in range(self.bbox.h):
+            for xx in range(self.bbox.w):
+                yield CellPosition(self.cells, self.bbox.x + xx, self.bbox.y + yy)
+        
+                
+class CellUpdates:
+    def __init__(self, childupdates=None):
+        if childupdates is not None:
+            for idx, c in enumerate(childupdates):
+                setattr(self, str(idx), c)
+                
+    def __iter__(self):
+        for name, cu in self.__dict__.items():
+            if isinstance(cu, CellUpdate) and cu.dirty:
+                yield cu
+            elif isinstance(cu, CellUpdates):
+                for cuu in cu:
+                    yield cuu
+
+    def crop(self, composite):
+        for cu in self:
+            for cp in cu:
+                if (cp.x, cp.y) not in composite:
+                    yield cp
+        
+
+class CellGrid:
+    def __init__(self, size):
+        self.size = size
+        self.grid = [ [ None ]*size.w for t in range(size.h) ]
+        self.dirty = []
+
+    def get_dirty(self):
+        for cp in self.dirty:
+            yield cp
+        self.dirty = []
+        
+    def update(self, cp):
+        self.grid[cp.y][cp.x] = cp.cell
+        self.dirty.append(cp)
+                
 
 class LineDrawing:
     """FIXME: Simplify this by turning it into a dict of frozenset keys:
@@ -155,8 +225,12 @@ class Cells:
 
 
     @classmethod
-    def fill(cls, char, colours, w, h):
+    def fill_char(cls, char, colours, w, h):
         return cls([ [ Cell(char, colours) for t in range(w) ] for u in range(h) ], w, h)
+
+    @classmethod
+    def fill(cls, cell, size):
+        ...
     
 
     @classmethod

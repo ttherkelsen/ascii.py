@@ -15,7 +15,7 @@ class Colours:
     
     @staticmethod
     def to_memoryview(colour):
-        # FIXME: Don't assume a colour is defined as "#rrggbbaa", could be (r, g, b, a)
+        # FIXME: Don't assume a colour is defined as "#rrggbbaa", could be (r, g, b, a) or "#rrggbb"?
         return memoryview(bytes((
             int(colour[1:3], 16),
             int(colour[3:5], 16),

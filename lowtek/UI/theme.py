@@ -13,8 +13,10 @@ class LightTheme(Theme):
             border = Colours("#c0c0c0ff", "#333333ff"),
             button = Colours("#30c030ff", "#000000ff"),
             button_hover = Colours("#30c0c0ff", "#000000ff"),
-            )
-        self.background = " "
+            background = Colours("#a0a0a0ff", "#333333ff"),            
+        )
+        self.background = "."
+        self.frame_background = " "
         self.font_name = "ucs_9x15"
 
         
@@ -27,7 +29,9 @@ class DarkTheme(Theme):
             border = Colours("#000000ff", "#f0f0f0ff"), 
             button = Colours("#30c030ff", "#000000ff"),
             button_hover = Colours("#30c0c0ff", "#000000ff"),
-            )
-        self.background = " "
+            background = Colours("#000000ff", "#c0c0c0ff"),
+        )
+        self.background = "."
+        self.frame_background = " "
         self.font_name = "ucs_9x15"
 

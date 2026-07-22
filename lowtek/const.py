@@ -1,5 +1,7 @@
 # Various constants
 
+from enum import Enum, auto, IntFlag
+
 class Align(Enum):
     LEFT = auto()
     CENTER = auto()

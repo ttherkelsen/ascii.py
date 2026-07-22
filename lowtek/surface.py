@@ -1,30 +1,27 @@
 from .font import Font
-from .colours import Colours
-from .cell import Cell
-from .classes import PixelPosition, Size
 
-from pyscript import web, ffi
-import js
+from pyscript import web
 
 #FIXME: Destroy method?
 
 class Surface:
-    def __init__(self, js_id_or_div, font_name, size, init=None, pos=None):
+    def __init__(self, js_id_or_div, font_name, size, init=None):
         if isinstance(js_id_or_div, str):
-            self.parent_div = web.page.find(f"#{js_id_or_div}")[0]
+            self.div = web.page.find(f"#{js_id_or_div}")[0]
         else:
-            self.parent_div = js_id_or_div
-        self.js_id_or_div = js_id_or_div
+            self.div = js_id_or_div
         self.font_name = font_name
         self.size = size
         self.font = Font.load(font_name)
-        self.pos = pos
 
         self.create_dom_elements()
-        if init is None:
-            self.colour_fill("#000000")
-        else:
-            self.fill(init)
+        match init:
+            case None:
+                pass
+            case str():
+                self.colour_fill(init)
+            case _:
+                self.fill(init)
 
     @property
     def pixel_width(self):
@@ -48,33 +45,16 @@ class Surface:
         style = {
             'width': f"{self.pixel_width}px",
             'height': f"{self.pixel_height}px",
-            'z-index': '0',
         }
-        if self.pos is None:
-            style['position'] = 'relative'
-        else:
-            style['position'] = 'absolute'
-            style['top'] = f"{self.pos.y}px"
-            style['left'] = f"{self.pos.x}px"
             
-        self.div = web.div(canvas, style=style)
-        self.parent_div.append(self.div)
+        self.div.append(canvas)
         
         # Keep local proxy of canvas 2d context
         self.ctx = canvas._dom_element.getContext("2d")
 
-    def add_child(self, bbox, init=None, font_name=None):
-        if font_name is None:
-            font_name = self.font_name
-        child = Surface(
-            self.div, font_name, bbox.to_size(), init,
-            bbox.to_position().to_pixels(Size(self.font.width, self.font.height))
-        )
-        return child
-        
     def colour_fill(self, colour):
-        # FIXME: Fill canvas with colour
-        pass
+        self.ctx.fillStyle = colour;
+        self.ctx.fillRect(0, 0, self.pixel_width, self.pixel_height);
         
     def fill(self, cell):
         glyph = self.font.render_glyph(cell)
@@ -86,4 +66,8 @@ class Surface:
         glyph = self.font.render_glyph(cell)
         self.ctx.putImageData(glyph, x*self.font.width, y*self.font.height)
     
-    
+    def update(self, cu):
+        for cp in cu:
+            glyph = self.font.render_glyph(cp.cell)
+            self.ctx.putImageData(glyph, cp.x*self.font.width, cp.y*self.font.height)
+            

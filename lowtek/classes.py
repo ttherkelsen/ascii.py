@@ -18,13 +18,13 @@ class Size:
         self.h = h
 
     def __add__(self, other):
-        if other is not Size:
+        if not isinstance(other, Size):
             return NotImplemented
 
         return Size(self.w + other.w, self.h + other.h)
 
     def __sub__(self, other):
-        if other is not Size:
+        if not isinstance(other, Size):
             return NotImplemented
 
         return Size(abs(self.w - other.w), abs(self.h - other.h))
@@ -59,9 +59,20 @@ class BBox:
         self.w = w
         self.h = h
 
+    def __str__(self):
+        return f"<BBox @ {id(self)} {self.x=} {self.y=} {self.w=} {self.h=}"
+    __repr__ = __str__
+        
     def to_size(self):
         return Size(self.w, self.h)
 
     def to_position(self):
         return Position(self.x, self.y)
+
+    def to_composite(self):
+        c = set()
+        for y in range(self.h):
+            for x in range(self.w):
+                c.add(( self.x + x, self.y + y ))
+        return c
     
