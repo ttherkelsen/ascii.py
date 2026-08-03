@@ -1,11 +1,14 @@
 TODO:
 - border/margin/padding
+- moving panels around
+- user interaction framework (needed for windows, buttons, etc)
 - layout managers (Row, Column, etc)
 - Do pythonic type hints
 - bdf2lgf conversion tool
 - test of fonts with depth > 1 (multicolour)
 
 DONE:
+- rename Frame -> Panel
 - fix component blank space (fill) design
 - test positioning of absolute lm
 - pyscript 2026.7.3

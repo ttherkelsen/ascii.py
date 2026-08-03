@@ -1,6 +1,6 @@
 from .screen import Screen
 from .theme import LightTheme, DarkTheme
-from .frame import Frame
+from .panel import Panel
 from .fill import Fill
 
 class layout:
