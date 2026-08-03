@@ -44,6 +44,16 @@ class CellUpdateBBoxFill(CellUpdateBBox):
             for xx in range(self.bbox.w):
                 yield CellPosition(self.cells, self.bbox.x + xx, self.bbox.y + yy)
         
+
+class CellUpdateComposite(CellUpdate):
+    def __init__(self, cells, composite):
+        super().__init__(cells)
+        self.composite = composite
+
+    def iter(self):
+        for x, y in self.composite:
+            yield CellPosition(self.cells, x, y)
+        
                 
 class CellUpdates:
     def __init__(self, childupdates=None):
@@ -64,7 +74,21 @@ class CellUpdates:
             for cp in cu:
                 if (cp.x, cp.y) not in composite:
                     yield cp
-        
+
+    def fill(self, bbox):
+        composite = bbox.to_composite()
+        for cu in self:
+            for cp in cu:
+                 # We intentionally use remove because no component
+                 # should ever render to any cell position more than
+                 # once.
+                composite.remove((cp.x, cp.y))
+            cu.dirty = True
+        return composite
+                    
+    def dirty(self, state=True):
+        for cu in self:
+            cu.dirty = state
 
 class CellGrid:
     def __init__(self, size):
@@ -80,7 +104,7 @@ class CellGrid:
     def update(self, cp):
         self.grid[cp.y][cp.x] = cp.cell
         self.dirty.append(cp)
-                
+
 
 class LineDrawing:
     """FIXME: Simplify this by turning it into a dict of frozenset keys:

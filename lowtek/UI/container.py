@@ -9,7 +9,11 @@ class Container(Component):
     (defaults to the Rows layout) and it is this manager which will
     handle all layout logic.
     """
-    def __init__(self, children=None, layout=None, **component):
+    def __init__(
+            self, /, *,
+            children = None, # List of child components
+            layout   = None, # Layout manager, defaults to Row()
+            **component):
         super().__init__(**component)
         self.children = children if children is not None else []
         self.layout = layout or Row()
@@ -20,9 +24,7 @@ class Container(Component):
         return csize + self.component_size
 
     def layout_done(self, bbox):
-        # FIXME: Take decorations into account
         self.layout.done(bbox, self.children)
+        self.cells.main = CellUpdates([ t.render() for t in self.children ])
+        super().layout_done(bbox)
 
-    def render(self):
-        return CellUpdates([ t.render() for t in self.children ])
-    

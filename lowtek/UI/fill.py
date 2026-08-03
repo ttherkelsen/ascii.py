@@ -11,12 +11,12 @@ class Fill(Component):
         self.cells.main.cells = value
         self.cells.main.dirty = True
         
-    # FIXME: Support borders etc
     def layout_hint(self, size):
-        return size
+        return self.component_size # FIXME: Should a component allow Size(0, 0)?
 
     def layout_done(self, bbox):
         self.cells.main = CellUpdateBBoxFill(self.cell, bbox)
+        super().layout_done(bbox)
 
     
         

@@ -1,5 +1,5 @@
 from enum import Enum, auto, IntFlag
-from ..cell import CellUpdates
+from ..cell import CellUpdates, CellUpdateComposite
 from .. import const
 from ..classes import Rect, Size
 
@@ -14,6 +14,7 @@ class Component:
             padding = None,             # Interior space around component content
             sizing  = const.Sizing.MAX, # How should component size itself (MAX/MIN)
             bbox    = None,             # Used by some layout managers
+            fill    = None,             # If specified, fill any cells not rendered by children with this cell
     ):
         self.align = align
         self.valign = valign
@@ -22,6 +23,7 @@ class Component:
         self.padding = padding
         self.sizing = sizing
         self.bbox = bbox
+        self.fill = fill
         self.cells = CellUpdates()
 
     @property
@@ -72,15 +74,18 @@ class Component:
         
     def layout_done(self, bbox): 
         """
-        Called from parent component (usually a Container) with the bounding box (x, y, width and height,
-        usually x = y = 0) that this component must render inside.
+        Called from parent component (usually a Container) with
+        the bounding box (x, y, width and height) that this component
+        must render inside.
 
-        Things like applying (v)align, truncating, adding scrollbars, etc happen in this step.
+        Things like applying (v)align, truncating, adding scrollbars,
+        etc happen in this step.
         """
         # Fixme: Scrollbar support, for now always just truncate
         self._bbox = bbox
         theme = self._screen.theme
-        size = Size(w=self.cells.main.w, h=self.cells.main.h)
+        size = Size(0, 0) # FIXME self.cells.main.get_size() if hasattr(self.cells, "main") else Size(0, 0)
+            
         if self.padding:
             self.cells.translate_all(x=self.padding.w, y=self.padding.n)
             size.expand(self.padding)
@@ -108,6 +113,11 @@ class Component:
                 colours=theme.colours.margin,
             )
 
+        if self.fill:
+            if composite := self.cells.fill(bbox):
+                print(len(composite))
+                self.cells.fill = CellUpdateComposite(self.fill, composite)
+            
 
     def render(self):
         return self.cells

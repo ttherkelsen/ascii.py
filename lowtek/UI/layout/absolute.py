@@ -19,5 +19,7 @@ class Absolute:
 
     def done(self, bbox, children):
         for c in children:
+            if c.bbox:
+                c.bbox.move(bbox.to_position())
             c.layout_done(c.bbox or bbox)
     

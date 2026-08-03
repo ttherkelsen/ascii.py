@@ -1,12 +1,14 @@
 TODO:
-- test positioning of absolute lm
-- layout managers
 - border/margin/padding
+- layout managers (Row, Column, etc)
 - Do pythonic type hints
 - bdf2lgf conversion tool
 - test of fonts with depth > 1 (multicolour)
 
 DONE:
+- fix component blank space (fill) design
+- test positioning of absolute lm
+- pyscript 2026.7.3
 - test render cell update lifecycles
 - screen/frame paradigm
 - Update to latest PyScript (2026.7.2)

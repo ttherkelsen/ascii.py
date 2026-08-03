@@ -62,7 +62,15 @@ class BBox:
     def __str__(self):
         return f"<BBox @ {id(self)} {self.x=} {self.y=} {self.w=} {self.h=}"
     __repr__ = __str__
-        
+
+    def move(self, pos, relative=True):
+        if relative:
+            self.x += pos.x
+            self.y += pos.y
+        else:
+            self.x = pos.x
+            self.y = pos.y
+    
     def to_size(self):
         return Size(self.w, self.h)
 

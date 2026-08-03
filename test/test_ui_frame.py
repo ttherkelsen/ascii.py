@@ -26,6 +26,17 @@ def run(*args):
             layout = UI.layout.Absolute(),
             children=[ UI.Fill(Cell("a", theme.colours.text)) ],
         ),
+        UI.Frame(
+            bbox = BBox(20, 0, 10, 10),
+            layout = UI.layout.Absolute(),
+            fill = Cell(theme.frame_background, theme.colours.text),
+            children=[ UI.Fill(Cell("a", theme.colours.text), bbox=BBox(1, 1, 3, 3)) ],
+        ),
+        UI.Frame(
+            bbox = BBox(35, 10, 5, 5),
+            layout = UI.layout.Absolute(),
+            fill = Cell("d", theme.colours.text),
+        ),
     )
     screen.render()
     screen.ui[1].children[0].update("cell", Cell("z", theme.colours.text))
