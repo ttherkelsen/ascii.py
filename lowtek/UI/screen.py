@@ -43,7 +43,7 @@ class Screen:
             for cp in update.crop(composite): # Remove cells that overlap with previously rendered frames
                 self.cells.update(cp)
                 updated += 1
-            print(updated, "cells updated")
+            #print(updated, "cells updated")
             composite |= frame.bbox.to_composite()
 
         self.surface.update(self.cells.get_dirty())

@@ -115,7 +115,6 @@ class Component:
 
         if self.fill:
             if composite := self.cells.fill(bbox):
-                print(len(composite))
                 self.cells.fill = CellUpdateComposite(self.fill, composite)
             
 
