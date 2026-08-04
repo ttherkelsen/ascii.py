@@ -2,11 +2,12 @@ from lowtek.surface import Surface
 from lowtek import UI
 from lowtek.classes import BBox, Size
 from lowtek.cell import Cell
+from lowtek import utils
 
 import js
 
 def run(*args):
-    theme = UI.LightTheme()
+    utils.set_theme(UI.LightTheme()) # Must be called before any UI objects can be used!
     screen = UI.Screen(
         surface = Surface('canvas', 'ucs_9x15', Size(80, 40)),
         theme = theme,

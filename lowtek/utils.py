@@ -36,3 +36,6 @@ def memoize_args(f):
         return cache[args]
     
     return memoized
+
+def set_theme(theme):
+    __builtins__['theme'] = theme
