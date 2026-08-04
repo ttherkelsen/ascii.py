@@ -115,7 +115,7 @@ class Component:
 
         if self.fill:
             if composite := self.cells.fill(bbox):
-                self.cells.fill = CellUpdateComposite(self.fill, composite)
+                self.cells.fill = CellUpdateComposite(cells=self.fill, composite=composite)
             
 
     def render(self):

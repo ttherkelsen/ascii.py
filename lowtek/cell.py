@@ -1,11 +1,17 @@
 from enum import Enum, auto
-from .classes import Rect
 from argparse import Namespace
+from .classes import Rect, Position
+from .glyphs import GLYPHS
 
 class Cell:
     def __init__(self, glyph, colours):
         self.glyph = glyph if isinstance(glyph, int) else ord(glyph)
         self.colours = colours
+
+    @classmethod
+    def str2cells(cls, text, colours):
+        return [ cls(t, colours) for t in text ]
+    
 
 class CellPosition:
     def __init__(self, cell, x, y):
@@ -13,11 +19,15 @@ class CellPosition:
         self.x = x
         self.y = y
 
+    @classmethod
+    def offset(cls, pos, cell, x, y):
+        return cls(cell, pos.x + x, pos.y + y)
         
 class CellUpdate:
-    def __init__(self, cells):
+    def __init__(self, cells, pos=None):
         self.cells = cells
         self.dirty = True
+        self.pos = pos or Position(0, 0)
 
     def __iter__(self):
         if not self.dirty:
@@ -27,8 +37,8 @@ class CellUpdate:
         self.dirty = False
 
 class CellUpdateBBox(CellUpdate):
-    def __init__(self, cells, bbox):
-        super().__init__(cells)
+    def __init__(self, bbox, **cellupdate):
+        super().__init__(**cellupdate)
         self.bbox = bbox
 
     def iter(self):
@@ -44,17 +54,44 @@ class CellUpdateBBoxFill(CellUpdateBBox):
             for xx in range(self.bbox.w):
                 yield CellPosition(self.cells, self.bbox.x + xx, self.bbox.y + yy)
         
+class CellUpdateRow(CellUpdate):
+    def iter(self):
+        for idx, cell in enumerate(self.cells):
+            yield CellPosition.offset(self.pos, self.cells[idx], idx, 0)
 
+class CellUpdateColumn(CellUpdate):
+    def iter(self):
+        for idx, cell in enumerate(self.cells):
+            yield CellPosition.offset(self.pos, self.cells[idx], 0, idx)
+                
 class CellUpdateComposite(CellUpdate):
-    def __init__(self, cells, composite):
-        super().__init__(cells)
+    def __init__(self, composite, **cellupdate):
+        super().__init__(**cellupdate)
         self.composite = composite
 
     def iter(self):
         for x, y in self.composite:
             yield CellPosition(self.cells, x, y)
         
-                
+
+class CellUpdateLineDrawingCross(CellUpdate):
+    def __init__(self, size, colours, center=None, pos=None):
+        super().__init__(cells=None, pos=pos)
+        self.size = size
+        self.center = center or size.center()
+        self.hline = Cell(GLYPHS['B s s'], colours)
+        self.vline = Cell(GLYPHS['Bs s '], colours)
+        self.cross = Cell(GLYPHS['Bssss'], colours)
+
+    def iter(self):
+        for x in range(self.size.w):
+            if x != self.center.x:
+                yield CellPosition.offset(self.pos, self.hline, x, self.center.y)
+        for y in range(self.size.h):
+            if y != self.center.y:
+                yield CellPosition.offset(self.pos, self.vline, self.center.x, y)
+        yield CellPosition.offset(self.pos, self.cross, self.center.x, self.center.y)
+            
 class CellUpdates:
     def __init__(self, childupdates=None):
         if childupdates is not None:

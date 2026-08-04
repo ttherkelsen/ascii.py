@@ -1,4 +1,7 @@
 TODO:
+- Rename CellUpdateXXX to XXX and cleanup old code from cell.py
+- always use named arguments for cells/component classes
+- line drawing
 - border/margin/padding
 - moving panels around
 - user interaction framework (needed for windows, buttons, etc)

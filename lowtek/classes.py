@@ -29,6 +29,9 @@ class Size:
 
         return Size(abs(self.w - other.w), abs(self.h - other.h))
 
+
+    def center(self):
+        return Position(x=self.w//2, y=self.h//2)
     
     def expand(self, rect):
         self.w += rect.e + rect.w
@@ -47,22 +50,25 @@ class Position:
         self.x = x
         self.y = y
 
+    def __str__(self):
+        return f"<Position @ {id(self)} {self.x=} {self.y=}"
+    __repr__ = __str__
+
+    def __add__(self, other):
+        if not isinstance(other, Position):
+            return NotImplemented
+
+        return Position(self.x + other.x, self.y + other.y)
+    
+    def __sub__(self, other):
+        if not isinstance(other, Position):
+            return NotImplemented
+
+        return Position(self.x - other.x, self.y - other.y)
+
     def to_pixels(self, pixelsize):
         return PixelPosition(self.x * pixelsize.w, self.y * pixelsize.h)
     
-PixelPosition = Position
-
-class BBox:
-    def __init__(self, x, y, w, h):
-        self.x = x
-        self.y = y
-        self.w = w
-        self.h = h
-
-    def __str__(self):
-        return f"<BBox @ {id(self)} {self.x=} {self.y=} {self.w=} {self.h=}"
-    __repr__ = __str__
-
     def move(self, pos, relative=True):
         if relative:
             self.x += pos.x
@@ -70,7 +76,19 @@ class BBox:
         else:
             self.x = pos.x
             self.y = pos.y
-    
+
+PixelPosition = Position
+
+class BBox(Position):
+    def __init__(self, x, y, w, h):
+        super().__init__(x, y)
+        self.w = w
+        self.h = h
+
+    def __str__(self):
+        return f"<BBox @ {id(self)} {self.x=} {self.y=} {self.w=} {self.h=}"
+    __repr__ = __str__
+
     def to_size(self):
         return Size(self.w, self.h)
 

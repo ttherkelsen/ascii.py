@@ -2,6 +2,7 @@ from .screen import Screen
 from .theme import LightTheme, DarkTheme
 from .panel import Panel
 from .fill import Fill
+from .glyphpage import GlyphPage
 
 class layout:
     pass

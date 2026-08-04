@@ -29,7 +29,7 @@ def run(*args):
         UI.Panel(
             bbox = BBox(20, 0, 10, 10),
             layout = UI.layout.Absolute(),
-            fill = Cell(theme.frame_background, theme.colours.text),
+            fill = Cell(theme.panel_background, theme.colours.text),
             children=[ UI.Fill(Cell("a", theme.colours.text), bbox=BBox(1, 1, 3, 3)) ],
         ),
         UI.Panel(

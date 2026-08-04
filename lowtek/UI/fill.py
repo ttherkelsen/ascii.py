@@ -15,7 +15,7 @@ class Fill(Component):
         return self.component_size # FIXME: Should a component allow Size(0, 0)?
 
     def layout_done(self, bbox):
-        self.cells.main = CellUpdateBBoxFill(self.cell, bbox)
+        self.cells.main = CellUpdateBBoxFill(cells=self.cell, bbox=bbox)
         super().layout_done(bbox)
 
     
