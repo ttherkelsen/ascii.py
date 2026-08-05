@@ -7,12 +7,14 @@ from lowtek import utils
 import js
 
 def run(*args):
+    size = Size(80, 40)
     theme = UI.LightTheme()
     screen = UI.Screen(
-        surface = Surface('canvas', 'ucs_9x15', Size(80, 40)),
+        surface = Surface('canvas', 'ucs_9x15', size),
         theme = theme,
         ui = [
             UI.Panel(
+                bbox = size.to_bbox(),
                 layout = UI.layout.Absolute(),
                 children =[ UI.Fill(Cell(theme.background, theme.colours.background)) ],
             ),

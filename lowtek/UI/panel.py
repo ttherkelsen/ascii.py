@@ -16,9 +16,13 @@ class Panel(Container):
     Window is a panel with user interactive controls for things like
     moving and resizing the window (if not disabled intentionally)
     """
-    def __init__(self, bbox=None, **container):
+    def __init__(
+            self, /, *,
+            bbox,
+            **container,
+    ):
         super().__init__(**container)
-        self.bbox = bbox if bbox is not None else BBox(0, 0, self._screen.size.w, self._screen.size.h)
+        self.bbox = bbox
 
     def layout_hint(self, size):
         super().layout_hint(self.bbox.to_size())

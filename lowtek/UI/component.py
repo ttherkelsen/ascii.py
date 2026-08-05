@@ -86,7 +86,7 @@ class Component:
         """
         # Fixme: Scrollbar support, for now always just truncate
         self._bbox = bbox
-        theme = self._screen.theme
+        theme = self.theme
         size = Size(0, 0) # FIXME self.cells.main.get_size() if hasattr(self.cells, "main") else Size(0, 0)
             
         if self.padding:

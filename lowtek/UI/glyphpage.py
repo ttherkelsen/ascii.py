@@ -20,22 +20,22 @@ class GlyphPage(Component):
             CellUpdateLineDrawingCross(
                 pos=bbox.to_position(),
                 size=self.SIZE,
-                colours=self._screen.theme.colours.border,
+                colours=self.theme.colours.border,
                 center=self.POS),
             CellUpdateRow(
-                cells=Cell.str2cells(f"{(self.page % 0xff00)>>8:x}yx", self._screen.theme.colours.text),
+                cells=Cell.str2cells(f"{(self.page % 0xff00)>>8:x}yx", self.theme.colours.text),
                 pos=bbox.to_position()),
             CellUpdateRow(
-                cells=Cell.str2cells(" ".join([ f"{t:x}" for t in range(16) ]), self._screen.theme.colours.text),
+                cells=Cell.str2cells(" ".join([ f"{t:x}" for t in range(16) ]), self.theme.colours.text),
                 pos=bbox.to_position() + Position(6, 0),
                 ),
             CellUpdateColumn(
-                cells=Cell.str2cells(" ".join([ f"{t:x}" for t in range(16) ]), self._screen.theme.colours.text),
+                cells=Cell.str2cells(" ".join([ f"{t:x}" for t in range(16) ]), self.theme.colours.text),
                 pos=bbox.to_position() + Position(3, 2),
                 ),
         ] + [
             CellUpdateRow(
-                cells=Cell.str2cells(" ".join([ chr(self.page+u*16+t) for t in range(16) ]), self._screen.theme.colours.text),
+                cells=Cell.str2cells(" ".join([ chr(self.page+u*16+t) for t in range(16) ]), self.theme.colours.text),
                 pos=bbox.to_position() + Position(6, u*2+2),
             )
             for u in range(16)
