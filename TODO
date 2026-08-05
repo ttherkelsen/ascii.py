@@ -1,4 +1,5 @@
 TODO:
+- cleanup unused/obsolete files
 - Rename CellUpdateXXX to XXX and cleanup old code from cell.py
 - always use named arguments for cells/component classes
 - line drawing

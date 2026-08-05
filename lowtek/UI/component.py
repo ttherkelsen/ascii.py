@@ -15,6 +15,7 @@ class Component:
             sizing  = const.Sizing.MAX, # How should component size itself (MAX/MIN)
             bbox    = None,             # Used by some layout managers
             fill    = None,             # If specified, fill any cells not rendered by children with this cell
+            theme   = None,             # Normally set during screen initialisation, but can be set manually
     ):
         self.align = align
         self.valign = valign
@@ -53,11 +54,13 @@ class Component:
         return Size(w=w, h=h)
 
 
-    def update(self, name, value):
-        try:
-            return getattr(self, f'update_{name}')(value)
-        except AttributeError:
-            pass
+    def update(self, name, value, lazy=False):
+        if lazy and getattr(self, name, None) is not None:
+            return
+        
+        if (func := getattr(self, f'update_{name}', None)) is not None:
+            return func(value, lazy)
+        
         setattr(self, name, value)
         
     def layout_hint(self, size):

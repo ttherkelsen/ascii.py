@@ -1,4 +1,3 @@
-from .component import Component
 from ..cell import CellGrid
 
 # Important note: Screen is not a component -- you cannot have a screen
@@ -9,17 +8,24 @@ from ..cell import CellGrid
 # UI must be a list of Panel (or its descendants) objects.
 
 class Screen:
-    def __init__(self, surface, theme):
+    def __init__(
+            self, /, *,
+            surface,
+            theme,
+            ui
+    ):
         self.surface = surface
         self.theme = theme
-        self.ui = []
-
-        Component._screen = self
+        self.ui = ui
+        self.update_theme()
+        
         self.cells = CellGrid(size=self.size)
         self.layout_required = True
 
-    def set_ui(self, *panels):
-        self.ui = panels
+    def update_theme(self):
+        for panel in self.ui:
+            panel.update("theme", self.theme, lazy=True)
+            
         
     @property
     def size(self):

@@ -18,6 +18,12 @@ class Container(Component):
         self.children = children if children is not None else []
         self.layout = layout or Row()
 
+    def update_theme(self, theme, lazy=False):
+        self.theme = theme
+            
+        for child in self.children:
+            child.update("theme", theme, lazy)
+        
     def layout_hint(self, size):
         # FIXME: Take decorations (border, padding, margin) into account
         csize = self.layout.hint(size - self.component_size, self.children)
@@ -28,3 +34,4 @@ class Container(Component):
         self.cells.main = CellUpdates([ t.render() for t in self.children ])
         super().layout_done(bbox)
 
+    
