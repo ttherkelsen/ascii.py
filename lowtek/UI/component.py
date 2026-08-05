@@ -1,7 +1,6 @@
-from enum import Enum, auto, IntFlag
 from .. import cell
 from .. import const
-from ..classes import Rect, Size
+from ..classes import Size
 
 class Component:
     """Every UI component should have Component as (one of) its base class(es)."""
@@ -33,14 +32,14 @@ class Component:
         h = 0
         w = 0
 
-        if self.border:
-            if self.border.n:
+        if self.border is not None:
+            if self.border[const.Border.N] != " ":
                 h += 1
-            if self.border.s:
+            if self.border[const.Border.S] != " ":
                 h += 1
-            if self.border.e:
+            if self.border[const.Border.E] != " ":
                 w += 1
-            if self.border.w:
+            if self.border[const.Border.W] != " ":
                 w += 1
 
         if self.margin:

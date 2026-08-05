@@ -22,6 +22,8 @@ class Sizing(IntFlag):
 
 
 class Border(Enum):
-    SINGLE = auto()
-    DOUBLE = auto()
-    
+    N = 0
+    E = 1
+    S = 2
+    W = 3
+

@@ -1,16 +1,7 @@
 # Various utlity and helper classes which are too small to justify having their
 # own file
 
-class Rect:
-    def __init__(self, nesw=0, n=0, e=0, s=0, w=0):
-        if nesw:
-            # Special case, Rect(int > 0) == all sides of rectangle
-            n = e = s = w = nesw
-        self.n = n
-        self.e = e
-        self.s = s
-        self.w = w
-
+class 
 
 class Size:
     def __init__(self, w, h):

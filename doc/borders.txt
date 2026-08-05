@@ -1,0 +1,9 @@
+Borders are defined as a 4-character string, using the same letter
+codes as found in glyphs.GLYPHS.
+
+The order of the borders is N-E-S-W.
+
+For example, to define a border using standard lines only around the
+left (west) and right (east) sides, your border string would be " s s".
+
+To define a border on all sides using double lines, the border string is "dddd"
