@@ -7,36 +7,38 @@ import js
 
 def run(*args):
     theme = UI.LightTheme()
+    size = Size(80, 40)
     screen = UI.Screen(
-        surface = Surface('canvas', 'ucs_9x15', Size(80, 40)),
+        surface = Surface('canvas', 'ucs_9x15', size),
         theme = theme,
-    )
-    screen.set_ui( # FIXME: Ugly hack, figure out a way to do this better
-        UI.Panel(
-            layout = UI.layout.Absolute(),
-            children =[ UI.Fill(Cell(theme.background, theme.colours.background)) ],
-        ),
-        UI.Panel(
-            bbox = BBox(6, 6, 10, 10),
-            layout = UI.layout.Absolute(),
-            children=[ UI.Fill(Cell("b", theme.colours.text)) ],
-        ),
-        UI.Panel(
-            bbox = BBox(3, 3, 10, 10),
-            layout = UI.layout.Absolute(),
-            children=[ UI.Fill(Cell("a", theme.colours.text)) ],
-        ),
-        UI.Panel(
-            bbox = BBox(20, 0, 10, 10),
-            layout = UI.layout.Absolute(),
-            fill = Cell(theme.panel_background, theme.colours.text),
-            children=[ UI.Fill(Cell("a", theme.colours.text), bbox=BBox(1, 1, 3, 3)) ],
-        ),
-        UI.Panel(
-            bbox = BBox(35, 10, 5, 5),
-            layout = UI.layout.Absolute(),
-            fill = Cell("d", theme.colours.text),
-        ),
+        ui = [
+            UI.Panel(
+                bbox = size.to_bbox(),
+                layout = UI.layout.Absolute(),
+                children =[ UI.Fill(cell=Cell(theme.background, theme.colours.background)) ],
+            ),
+            UI.Panel(
+                bbox = BBox(6, 6, 10, 10),
+                layout = UI.layout.Absolute(),
+                children=[ UI.Fill(cell=Cell("b", theme.colours.text)) ],
+            ),
+            UI.Panel(
+                bbox = BBox(3, 3, 10, 10),
+                layout = UI.layout.Absolute(),
+                children=[ UI.Fill(cell=Cell("a", theme.colours.text)) ],
+            ),
+            UI.Panel(
+                bbox = BBox(20, 0, 10, 10),
+                layout = UI.layout.Absolute(),
+                fill = Cell(theme.panel_background, theme.colours.text),
+                children=[ UI.Fill(cell=Cell("a", theme.colours.text), bbox=BBox(1, 1, 3, 3)) ],
+            ),
+            UI.Panel(
+                bbox = BBox(35, 10, 5, 5),
+                layout = UI.layout.Absolute(),
+                fill = Cell("d", theme.colours.text),
+            ),
+        ],
     )
     screen.render()
     screen.ui[1].children[0].update("cell", Cell("z", theme.colours.text))

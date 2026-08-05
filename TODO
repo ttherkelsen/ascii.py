@@ -1,5 +1,4 @@
 TODO:
-- Containers should not use CellUpdates but just add to the Component CellUpdates
 - border/margin/padding
 - moving panels around
 - user interaction framework (needed for windows, buttons, etc)
@@ -9,6 +8,7 @@ TODO:
 - test of fonts with depth > 1 (multicolour)
 
 DONE:
+- Containers should not use CellUpdates but just add to the Component CellUpdates
 - Rename CellUpdateXXX to XXX and cleanup old code from cell.py
 - always use named arguments for cells/component classes
 - line drawing (need revisiting in the future)

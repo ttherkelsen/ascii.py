@@ -11,7 +11,7 @@ class Fill(Component):
         super().__init__(**component)
         self.cell = cell
 
-    def update_cell(self, value):
+    def update_cell(self, value, lazy=False):
         self.cells.main.cells = value
         self.cells.main.dirty = True
         

@@ -32,7 +32,8 @@ class Container(Component):
 
     def layout_done(self, bbox):
         self.layout.done(bbox, self.children)
-        self.cells.main = cell.CellUpdates([ t.render() for t in self.children ])
+        for idx, child in enumerate(self.children):
+            setattr(self.cells, f"child_{idx}", child.render())
         super().layout_done(bbox)
 
     
