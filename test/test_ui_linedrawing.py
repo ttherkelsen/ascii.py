@@ -22,7 +22,7 @@ def run(*args):
                 bbox = BBox(20, 3, 38, 34),
                 fill = Cell(theme.panel_background, theme.colours.panel_background),
                 layout = UI.layout.Absolute(),
-                children = [ UI.GlyphPage(0x2500) ],
+                children = [ UI.GlyphPage(page=0x2500) ],
             ),
         ],
     )

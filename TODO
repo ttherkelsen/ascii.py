@@ -1,8 +1,5 @@
 TODO:
-- cleanup unused/obsolete files
 - Rename CellUpdateXXX to XXX and cleanup old code from cell.py
-- always use named arguments for cells/component classes
-- line drawing
 - border/margin/padding
 - moving panels around
 - user interaction framework (needed for windows, buttons, etc)
@@ -12,6 +9,9 @@ TODO:
 - test of fonts with depth > 1 (multicolour)
 
 DONE:
+- always use named arguments for cells/component classes
+- line drawing (need revisiting in the future)
+- cleanup unused/obsolete files
 - rename Frame -> Panel
 - fix component blank space (fill) design
 - test positioning of absolute lm

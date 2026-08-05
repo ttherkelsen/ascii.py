@@ -13,7 +13,8 @@ class Container(Component):
             self, /, *,
             children = None, # List of child components
             layout   = None, # Layout manager, defaults to Row()
-            **component):
+            **component,
+    ):
         super().__init__(**component)
         self.children = children if children is not None else []
         self.layout = layout or Row()

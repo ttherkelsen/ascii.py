@@ -3,7 +3,11 @@ from ..cell import CellUpdateBBoxFill
 
 class Fill(Component):
     """A component that expands to fill the entire available space with a single glyph."""
-    def __init__(self, cell, **component):
+    def __init__(
+            self, /, *,
+            cell,
+            **component,
+    ):
         super().__init__(**component)
         self.cell = cell
 

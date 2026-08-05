@@ -8,7 +8,11 @@ class GlyphPage(Component):
     POS = Position(x=4, y=1)
     
     """Display the specified unicode page of glyphs."""
-    def __init__(self, page, **component):
+    def __init__(
+            self, /, *,
+            page,
+            **component,
+    ):
         super().__init__(**component)
         self.page = page
 
