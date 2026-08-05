@@ -1,5 +1,5 @@
 from enum import Enum, auto, IntFlag
-from ..cell import CellUpdates, CellUpdateComposite
+from .. import cell
 from .. import const
 from ..classes import Rect, Size
 
@@ -25,7 +25,7 @@ class Component:
         self.sizing = sizing
         self.bbox = bbox
         self.fill = fill
-        self.cells = CellUpdates()
+        self.cells = cell.CellUpdates()
 
     @property
     def component_size(self):
@@ -118,7 +118,7 @@ class Component:
 
         if self.fill:
             if composite := self.cells.fill(bbox):
-                self.cells.fill = CellUpdateComposite(cells=self.fill, composite=composite)
+                self.cells.fill = cell.Composite(cells=self.fill, composite=composite)
             
 
     def render(self):

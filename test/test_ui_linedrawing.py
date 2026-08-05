@@ -16,7 +16,7 @@ def run(*args):
             UI.Panel(
                 bbox = size.to_bbox(),
                 layout = UI.layout.Absolute(),
-                children =[ UI.Fill(Cell(theme.background, theme.colours.background)) ],
+                children =[ UI.Fill(cell=Cell(theme.background, theme.colours.background)) ],
             ),
             UI.Panel(
                 bbox = BBox(20, 3, 38, 34),

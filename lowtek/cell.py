@@ -8,9 +8,8 @@ class Cell:
         self.glyph = glyph if isinstance(glyph, int) else ord(glyph)
         self.colours = colours
 
-    @classmethod
-    def str2cells(cls, text, colours):
-        return [ cls(t, colours) for t in text ]
+def str2cells(text, colours):
+    return [ Cell(t, colours) for t in text ]
     
 
 class CellPosition:
@@ -40,7 +39,7 @@ class CellUpdate(abc.ABC):
     def iter(self):
         ... # Must be implemented in subclass
 
-class CellUpdateBBox(CellUpdate):
+class BBox(CellUpdate):
     def __init__(self, bbox, **cellupdate):
         super().__init__(**cellupdate)
         self.bbox = bbox
@@ -52,23 +51,23 @@ class CellUpdateBBox(CellUpdate):
                 yield CellPosition(self.cells[idx], self.bbox.x + xx, self.bbox.y + yy)
                 idx += 1
 
-class CellUpdateBBoxFill(CellUpdateBBox):
+class BBoxFill(BBox):
     def iter(self):
         for yy in range(self.bbox.h):
             for xx in range(self.bbox.w):
                 yield CellPosition(self.cells, self.bbox.x + xx, self.bbox.y + yy)
         
-class CellUpdateRow(CellUpdate):
+class Row(CellUpdate):
     def iter(self):
         for idx, cell in enumerate(self.cells):
             yield CellPosition.offset(self.pos, self.cells[idx], idx, 0)
 
-class CellUpdateColumn(CellUpdate):
+class Column(CellUpdate):
     def iter(self):
         for idx, cell in enumerate(self.cells):
             yield CellPosition.offset(self.pos, self.cells[idx], 0, idx)
                 
-class CellUpdateComposite(CellUpdate):
+class Composite(CellUpdate):
     def __init__(self, composite, **cellupdate):
         super().__init__(**cellupdate)
         self.composite = composite
@@ -78,7 +77,7 @@ class CellUpdateComposite(CellUpdate):
             yield CellPosition(self.cells, x, y)
         
 
-class CellUpdateLineDrawingCross(CellUpdate):
+class CrossLD(CellUpdate):
     def __init__(self, size, colours, center=None, pos=None):
         super().__init__(cells=None, pos=pos)
         self.size = size

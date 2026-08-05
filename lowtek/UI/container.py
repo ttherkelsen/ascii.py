@@ -1,6 +1,6 @@
 from .component import Component
 from .layout.row import Row
-from ..cell import CellUpdates
+from .. import cell
 
 class Container(Component):
     """
@@ -32,7 +32,7 @@ class Container(Component):
 
     def layout_done(self, bbox):
         self.layout.done(bbox, self.children)
-        self.cells.main = CellUpdates([ t.render() for t in self.children ])
+        self.cells.main = cell.CellUpdates([ t.render() for t in self.children ])
         super().layout_done(bbox)
 
     

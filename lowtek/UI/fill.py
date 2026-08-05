@@ -1,5 +1,5 @@
 from .component import Component
-from ..cell import CellUpdateBBoxFill
+from .. import cell
 
 class Fill(Component):
     """A component that expands to fill the entire available space with a single glyph."""
@@ -19,7 +19,7 @@ class Fill(Component):
         return self.component_size # FIXME: Should a component allow Size(0, 0)?
 
     def layout_done(self, bbox):
-        self.cells.main = CellUpdateBBoxFill(cells=self.cell, bbox=bbox)
+        self.cells.main = cell.BBoxFill(cells=self.cell, bbox=bbox)
         super().layout_done(bbox)
 
     
