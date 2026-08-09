@@ -1,6 +1,6 @@
 from lowtek.surface import Surface
 from lowtek import UI
-from lowtek.classes import BBox, Size, Frame
+from lowtek.classes import BBox, Size, Frame, FrameLD
 from lowtek.cell import Cell, CellHint
 from lowtek.colours import Colours
 from lowtek import utils
@@ -31,7 +31,21 @@ def run(*args):
                             w=CellHint(cell=Cell("b", Colours("#c0c0c0ff", "#ffffffff")), hint=3),
                             order="wnes",
                         ),
+                        padding=1,
+                        border='r',
                         cell=Cell("a", Colours('#ffc0c0ff', '#333333ff')),
+                    )
+                ],
+            ),
+            UI.Panel(
+                bbox = BBox(50, 5, 10, 10),
+                layout = UI.layout.Absolute(),
+                children = [
+                    UI.Fill(
+                        border=FrameLD(
+                            n="s",
+                        ),
+                        cell=Cell("b", Colours('#ffc0c0ff', '#333333ff')),
                     )
                 ],
             ),

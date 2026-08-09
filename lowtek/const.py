@@ -27,8 +27,10 @@ class LineDrawing:
     DOUBLE = 'd'
     THICK = 't'
     ROUNDED = 'r'
+    DOTTED2 = '2'
     DOTTED3 = '3'
     DOTTED4 = '4'
-    THICKDOTTED3 = '5'
-    THICKDOTTED4 = '6'
+    THICKDOTTED2 = '5'
+    THICKDOTTED3 = '6'
+    THICKDOTTED4 = '7'
     

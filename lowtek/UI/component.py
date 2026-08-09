@@ -1,6 +1,6 @@
 from .. import cell
 from .. import const
-from ..classes import Size, Frame
+from ..classes import Size, Frame, FrameLD
 
 
 class Component:
@@ -20,7 +20,7 @@ class Component:
     ):
         self.align = align
         self.valign = valign
-        self.border = Frame.from_str(border) if isinstance(border, str) else border
+        self.border = FrameLD.from_str(border) if isinstance(border, str) else border
         self.margin = Frame.from_int(margin) if isinstance(margin, int) else margin
         self.padding = Frame.from_int(padding) if isinstance(padding, int) else padding
         self.sizing = sizing
@@ -78,6 +78,16 @@ class Component:
         # Fixme: Scrollbar support, for now always just truncate
         self._bbox = bbox
 
+        if self.padding:
+            padding = self.padding.layout_done(bbox, self.theme)
+            self.cells.padding = cell.Frame(bbox=bbox, frame=padding)
+            bbox = bbox + padding.to_position() - padding.to_size()
+
+        if self.border:
+            border = self.border.layout_done(bbox, self.theme)
+            self.cells.border = cell.Frame(bbox=bbox, frame=border)
+            bbox = bbox + border.to_position() - border.to_size()
+            
         if self.margin:
             margin = self.margin.layout_done(bbox, self.theme)
             self.cells.margin = cell.Frame(bbox=bbox, frame=margin)

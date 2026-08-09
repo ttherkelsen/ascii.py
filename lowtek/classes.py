@@ -5,13 +5,19 @@ import copy
 
 from . import const
 from . import cell
+from .glyphs import GLYPHS
 
 class Core:
     def clone(self):
         return copy.copy(self)
 
 class Frame(Core):
-    def __init__(self, nesw=None, n=None, e=None, s=None, w=None, order='nswe'):
+    def __init__(
+            self,
+            nesw=None,
+            n=None, e=None, s=None, w=None,
+            order='nswe',
+    ):
         if nesw:
             n = e = s = w = nesw
 
@@ -72,6 +78,8 @@ class Frame(Core):
                 match value:
                     case int():
                         setattr(clone, d, cell.CellHint(cell.Cell(theme.margin, theme.colours.margin), value))
+                    case str():
+                        setattr(clone, d, cell.CellHint(cell.Cell(value, theme.colours.margin), 1))
                     case cell.Cell():
                         setattr(clone, d, cell.CellHint(value, 1))
                     case cell.CellHint():
@@ -86,7 +94,15 @@ class Frame(Core):
         for d in dirs:
             value = getattr(self, d)
             if value is not None:
-                total += value if isinstance(value, int) else value.hint
+                match value:
+                    case int():
+                        total += value
+                    case str():
+                        total += 1
+                    case cell.CellHint():
+                        total += value.hint
+                    case _:
+                        raise TypeError(f'illegal type for Frame.{d} ({value=})')
         return total
 
 
@@ -101,7 +117,87 @@ class Frame(Core):
         return cls(nesw=num)
 
     @classmethod
-    def from_str(cls, dirs, order='nesw'):
+    def from_str(cls, dirs, order="nesw"):
+        if len(dirs) == 1:
+            return cls(nesw=dirs)
+        return cls(**dict(zip(order, dirs)))
+
+class FrameLD(Frame):
+    LD = {
+        'n': 'B N N',
+        's': 'B S S',
+        'e': 'BE E ',
+        'w': 'BW W ',
+        'nw': 'B WN ',
+        'ne': 'B  NE',
+        'sw': 'BSW  ',
+        'se': 'BS  E',
+    }
+
+    def dir2glyph(self, dir):
+        temp = self.LD[dir]
+        if len(dir) == 1:
+            return GLYPHS[temp.replace(dir.upper(), getattr(self, dir))]
+
+        if getattr(self, dir[0]) and getattr(self, dir[1]):
+            temp = temp.replace(dir[0].upper(), getattr(self, dir[0]))
+            temp = temp.replace(dir[1].upper(), getattr(self, dir[1]))
+        elif getattr(self, dir[0]):
+            temp = self.LD[dir[0]]
+            temp = temp.replace(dir[0].upper(), getattr(self, dir[0]))
+        else: # getattr(self, dir[1])
+            temp = self.LD[dir[1]]
+            temp = temp.replace(dir[1].upper(), getattr(self, dir[1]))
+        return GLYPHS[temp]
+
+    def is_before(self, dirs):
+        return True
+    
+    def update_offsets(self, bbox):
+        super().update_offsets(bbox)
+
+        if self.n or self.w:
+            self.nw.offset = BBox(x=0, y=0, w=1, h=1)
+
+        if self.n or self.e:
+            self.ne.offset = BBox(x=bbox.w-1, y=0, w=1, h=1)
+
+        if self.s or self.w:
+            self.sw.offset = BBox(x=0, y=bbox.h-1, w=1, h=1)
+
+        if self.s or self.e:
+            self.se.offset = BBox(x=bbox.w-1, y=bbox.h-1, w=1, h=1)
+
+    
+    def layout_done(self, bbox, theme):
+        clone = self.clone()
+        def set_value(d, value):
+            match value:
+                case str():
+                    setattr(clone, d, cell.CellHint(cell.Cell(self.dir2glyph(d), theme.colours.margin), 1))
+                case cell.Cell():
+                    setattr(clone, d, cell.CellHint(value, 1))
+                case cell.CellHint():
+                    pass
+                case _:
+                    raise TypeError(f'illegal type for FrameLD.{d} ({value=})')
+                
+        for d in "nesw":
+            if value := getattr(self, d):
+                set_value(d, value)
+
+        for d in ('nw', 'ne', 'sw', 'se'):
+            if getattr(self, d[0]) or getattr(self, d[1]):
+                set_value(d, d)
+            else:
+                setattr(self, d, None)
+
+        clone.update_offsets(bbox)
+        clone.order = ('n', 'e', 's', 'w', 'nw', 'ne', 'sw', 'se')
+        return clone
+        
+    @classmethod
+    def from_str(cls, dirs):
         if len(dirs) == 1:
             return cls(nesw=dirs)
         return cls(**dict(zip(order, dirs)))
