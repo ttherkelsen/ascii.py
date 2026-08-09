@@ -10,13 +10,22 @@ class Cell:
 
 def str2cells(text, colours):
     return [ Cell(t, colours) for t in text ]
-    
+
+class CellHint:
+    def __init__(self, cell, hint=1, offset=None):
+        self.cell = cell
+        self.hint = hint
+        self.offset = offset
 
 class CellPosition:
     def __init__(self, cell, x, y):
         self.cell = cell
         self.x = x
         self.y = y
+
+    def __str__(self):
+        return f"CellPosition @ {id(self)} {self.cell=} {self.x=} {self.y=}"
+    __repr__ = __str__
 
     @classmethod
     def offset(cls, pos, cell, x, y):
@@ -84,7 +93,17 @@ class Composite(CellUpdate):
     def iter(self):
         for x, y in self.composite:
             yield CellPosition(self.cells, x, y)
+
+class Frame(BBox):
+    def __init__(self, frame, **bbox):
+        super().__init__(cells=None, **bbox)
+        self.frame = frame
         
+    def iter(self):
+        for d in self.frame:
+            for y in range(d.offset.h):
+                for x in range(d.offset.w):
+                    yield CellPosition(d.cell, self.bbox.x + d.offset.x + x, self.bbox.y + d.offset.y + y)
 
 class CrossLD(CellUpdate):
     def __init__(self, size, colours, center=None, pos=None):
@@ -137,7 +156,7 @@ class CellUpdates:
             cu.dirty = True
         return composite
                     
-    def dirty(self, state=True):
+    def dirty(self, state=True): # FIXME: Should this be a property instead?  If not should be renamed to set_dirty
         for cu in self:
             cu.dirty = state
 

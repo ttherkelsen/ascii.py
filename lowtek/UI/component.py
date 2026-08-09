@@ -1,6 +1,7 @@
 from .. import cell
 from .. import const
-from ..classes import Size
+from ..classes import Size, Frame
+
 
 class Component:
     """Every UI component should have Component as (one of) its base class(es)."""
@@ -19,42 +20,15 @@ class Component:
     ):
         self.align = align
         self.valign = valign
-        self.border = border
-        self.margin = margin
-        self.padding = padding
+        self.border = Frame.from_str(border) if isinstance(border, str) else border
+        self.margin = Frame.from_int(margin) if isinstance(margin, int) else margin
+        self.padding = Frame.from_int(padding) if isinstance(padding, int) else padding
         self.sizing = sizing
         self.bbox = bbox
         self.fill = fill
         self.theme = theme
         self.name = name
         self.cells = cell.CellUpdates()
-
-    @property
-    def component_size(self):
-        """Return combined size of everything except component content cells (borders, margin, padding, etc)"""
-        h = 0
-        w = 0
-
-        if self.border is not None:
-            if self.border[const.Border.N] != " ":
-                h += 1
-            if self.border[const.Border.S] != " ":
-                h += 1
-            if self.border[const.Border.E] != " ":
-                w += 1
-            if self.border[const.Border.W] != " ":
-                w += 1
-
-        if self.margin:
-            h += self.margin.n + self.margin.s
-            w += self.margin.e + self.margin.w
-
-        if self.padding:
-            h += self.padding.n + self.padding.s
-            w += self.padding.e + self.padding.w
-
-        return Size(w=w, h=h)
-
 
     def update(self, name, value, lazy=False):
         if lazy and getattr(self, name, None) is not None:
@@ -78,28 +52,18 @@ class Component:
         return the total of its own size and that of its parent
         component.
         """
-        h = 0
-        w = 0
+        size = Size(0, 0)
 
-        if self.border is not None:
-            if self.border[const.Border.N] != " ":
-                h += 1
-            if self.border[const.Border.S] != " ":
-                h += 1
-            if self.border[const.Border.E] != " ":
-                w += 1
-            if self.border[const.Border.W] != " ":
-                w += 1
-
+        if self.border:
+            size += self.border.to_size()
+            
         if self.margin:
-            h += self.margin.n + self.margin.s
-            w += self.margin.e + self.margin.w
+            size += self.margin.to_size()
 
         if self.padding:
-            h += self.padding.n + self.padding.s
-            w += self.padding.e + self.padding.w
-
-        return Size(w=w, h=h)
+            size += self.padding.to_size()
+            
+        return size
 
         
     def layout_done(self, bbox): 
@@ -113,41 +77,24 @@ class Component:
         """
         # Fixme: Scrollbar support, for now always just truncate
         self._bbox = bbox
-        theme = self.theme
-        size = Size(0, 0) # FIXME self.cells.main.get_size() if hasattr(self.cells, "main") else Size(0, 0)
-            
-        if self.padding:
-            self.cells.translate_all(x=self.padding.w, y=self.padding.n)
-            size.expand(self.padding)
-            self.cells.padding = Cells.frame(
-                size=size,
-                rect=self.padding,
-                char=theme.background,
-                colours=theme.colours.padding,
-            )
-        if self.border:
-            self.cells.translate_all(x=self.border.w and 1, y=self.border.n and 1)
-            size.expand_1(self.border)
-            self.cells.border = Cells.border(
-                size=size,
-                rect=self.border,
-                colours=theme.colours.border,
-            )
-        if self.margin:
-            self.cells.translate_all(x=self.margin.w, y=self.margin.n)
-            size.expand(self.margin)
-            self.cells.margin = Cells.frame(
-                size=size,
-                rect=self.margin,
-                char=theme.background,
-                colours=theme.colours.margin,
-            )
 
-        if self.fill:
-            if composite := self.cells.fill(bbox):
-                self.cells.fill = cell.Composite(cells=self.fill, composite=composite)
+        if self.margin:
+            margin = self.margin.layout_done(bbox, self.theme)
+            self.cells.margin = cell.Frame(bbox=bbox, frame=margin)
+            bbox = bbox + margin.to_position() - margin.to_size()
+
+
+        if self.fill and hasattr(self.cells, "component_fill"):
+            print(self.cells, dir(self.cells))
+            del self.cells.component_fill
             
+        return bbox
+
 
     def render(self):
+        if self.fill and not hasattr(self.cells, "component_fill"):
+            if composite := self.cells.fill(self._bbox):
+                self.cells.component_fill = cell.Composite(cells=self.fill, composite=composite)
+            
         return self.cells
 

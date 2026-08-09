@@ -16,8 +16,9 @@ class Fill(Component):
         return False
         
     def layout_done(self, bbox):
-        self.cells.main = cell.BBoxFill(cells=self.cell, bbox=bbox)
-        super().layout_done(bbox)
+        cbbox = super().layout_done(bbox)
+        self.cells.main = cell.BBoxFill(cells=self.cell, bbox=cbbox)
+        
 
     
         

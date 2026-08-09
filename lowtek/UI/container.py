@@ -29,14 +29,14 @@ class Container(Component):
         return { child.name: child for child in self.children + [ self ] if getattr(child, 'name', None) is not None }
             
     def layout_hint(self, size):
-        # FIXME: Take decorations (border, padding, margin) into account
-        csize = self.layout.hint(size - self.component_size, self.children)
-        return csize + self.component_size
+        psize = super().layout_hint(size)
+        csize = self.layout.hint(size - psize, self.children)
+        return csize + psize
 
     def layout_done(self, bbox):
-        self.layout.done(bbox, self.children)
+        pbbox = super().layout_done(bbox)
+        self.layout.done(pbbox, self.children)
         for idx, child in enumerate(self.children):
             setattr(self.cells, f"child_{idx}", child.render())
-        super().layout_done(bbox)
 
     

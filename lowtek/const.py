@@ -21,9 +21,14 @@ class Sizing(IntFlag):
     MAX = 10
 
 
-class Border(Enum):
-    N = 0
-    E = 1
-    S = 2
-    W = 3
-
+class LineDrawing:
+    NONE = ' '
+    SINGLE = 's'
+    DOUBLE = 'd'
+    THICK = 't'
+    ROUNDED = 'r'
+    DOTTED3 = '3'
+    DOTTED4 = '4'
+    THICKDOTTED3 = '5'
+    THICKDOTTED4 = '6'
+    

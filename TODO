@@ -1,5 +1,6 @@
 TODO:
 - border/margin/padding
+- make CellPosition take a Position object instead of x, y args?
 - moving panels around
 - user interaction framework (needed for windows, buttons, etc)
 - layout managers (Row, Column, etc)

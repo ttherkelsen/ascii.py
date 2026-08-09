@@ -16,6 +16,8 @@ class LightTheme(Theme):
             background = Colours("#a0a0a0ff", "#333333ff"),            
             panel_background = Colours("#c0c0c0ff", "#333333ff"),
         )
+        self.margin = " "
+        self.padding = " "
         self.background = "."
         self.panel_background = " "
         self.font_name = "ucs_9x15"
@@ -33,6 +35,8 @@ class DarkTheme(Theme):
             background = Colours("#000000ff", "#c0c0c0ff"),
             panel_background = Colours("#000000ff", "#f0f0f0ff"),
         )
+        self.margin = " "
+        self.padding = " "
         self.background = "."
         self.panel_background = " "
         self.font_name = "ucs_9x15"
