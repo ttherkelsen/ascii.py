@@ -28,6 +28,15 @@ class CellUpdate(abc.ABC):
         self.dirty = True
         self.pos = pos or Position(0, 0)
 
+    @property
+    def cells(self):
+        return self._cells
+
+    @cells.setter
+    def cells(self, value):
+        self._cells = value
+        self.dirty = True
+        
     def __iter__(self):
         if not self.dirty:
             return

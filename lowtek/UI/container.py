@@ -24,7 +24,10 @@ class Container(Component):
             
         for child in self.children:
             child.update("theme", theme, lazy)
-        
+
+    def get_names(self):
+        return { child.name: child for child in self.children + [ self ] if getattr(child, 'name', None) is not None }
+            
     def layout_hint(self, size):
         # FIXME: Take decorations (border, padding, margin) into account
         csize = self.layout.hint(size - self.component_size, self.children)

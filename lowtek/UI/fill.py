@@ -5,7 +5,7 @@ class Fill(Component):
     """A component that expands to fill the entire available space with a single glyph."""
     def __init__(
             self, /, *,
-            cell,
+            cell,        # Mandatory -- the cell used to fill with
             **component,
     ):
         super().__init__(**component)
@@ -13,11 +13,8 @@ class Fill(Component):
 
     def update_cell(self, value, lazy=False):
         self.cells.main.cells = value
-        self.cells.main.dirty = True
+        return False
         
-    def layout_hint(self, size):
-        return self.component_size # FIXME: Should a component allow Size(0, 0)?
-
     def layout_done(self, bbox):
         self.cells.main = cell.BBoxFill(cells=self.cell, bbox=bbox)
         super().layout_done(bbox)

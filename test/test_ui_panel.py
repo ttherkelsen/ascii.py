@@ -20,7 +20,7 @@ def run(*args):
             UI.Panel(
                 bbox = BBox(6, 6, 10, 10),
                 layout = UI.layout.Absolute(),
-                children=[ UI.Fill(cell=Cell("b", theme.colours.text)) ],
+                children=[ UI.Fill(cell=Cell("b", theme.colours.text), name='fill') ],
             ),
             UI.Panel(
                 bbox = BBox(3, 3, 10, 10),
@@ -41,7 +41,7 @@ def run(*args):
         ],
     )
     screen.render()
-    screen.ui[1].children[0].update("cell", Cell("z", theme.colours.text))
+    screen.update("fill", "cell", Cell("z", theme.colours.text))
     screen.render()
 
 js.addEventListener('py:all-done', run)

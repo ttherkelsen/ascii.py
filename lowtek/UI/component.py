@@ -15,6 +15,7 @@ class Component:
             bbox    = None,             # Used by some layout managers
             fill    = None,             # If specified, fill any cells not rendered by children with this cell
             theme   = None,             # Normally set during screen initialisation, but can be set manually
+            name    = None,             # Name of the component, for easy access via Screen.update
     ):
         self.align = align
         self.valign = valign
@@ -24,6 +25,8 @@ class Component:
         self.sizing = sizing
         self.bbox = bbox
         self.fill = fill
+        self.theme = theme
+        self.name = name
         self.cells = cell.CellUpdates()
 
     @property
@@ -55,23 +58,48 @@ class Component:
 
     def update(self, name, value, lazy=False):
         if lazy and getattr(self, name, None) is not None:
-            return
+            return False
         
         if (func := getattr(self, f'update_{name}', None)) is not None:
             return func(value, lazy)
         
         setattr(self, name, value)
+        return True
         
     def layout_hint(self, size):
         """
-        Called from parent component (usually a Container) with the max width & height that the
-        component is allowed.
+        Called from parent component (usually a Container) with the
+        max width & height that the component is allowed.
 
-        Return a Size object:
-        - h(eight) & w(idth) is the minimum size the component can have without truncating its
-          content and/or using scrollbars
+        Return a Size object; the minimum size the component can have
+        without truncating its content and/or using scrollbars.
+
+        Each component should only account for its own size, and
+        return the total of its own size and that of its parent
+        component.
         """
-        return Size(w=self.cells.main.w, h=self.cells.main.h) + self.component_size
+        h = 0
+        w = 0
+
+        if self.border is not None:
+            if self.border[const.Border.N] != " ":
+                h += 1
+            if self.border[const.Border.S] != " ":
+                h += 1
+            if self.border[const.Border.E] != " ":
+                w += 1
+            if self.border[const.Border.W] != " ":
+                w += 1
+
+        if self.margin:
+            h += self.margin.n + self.margin.s
+            w += self.margin.e + self.margin.w
+
+        if self.padding:
+            h += self.padding.n + self.padding.s
+            w += self.padding.e + self.padding.w
+
+        return Size(w=w, h=h)
 
         
     def layout_done(self, bbox): 

@@ -17,15 +17,25 @@ class Screen:
         self.surface = surface
         self.theme = theme
         self.ui = ui
+        self.names = self.get_names()
+
         self.update_theme()
         
         self.cells = CellGrid(size=self.size)
         self.layout_required = True
 
+    def get_names(self):
+        names = {}
+        for panel in self.ui:
+            names |= panel.get_names()
+        return names
+        
     def update_theme(self):
         for panel in self.ui:
             panel.update("theme", self.theme, lazy=True)
-            
+
+    def update(self, cname, name, value, lazy=False):
+        self.names[cname].update(name, value, lazy)
         
     @property
     def size(self):
