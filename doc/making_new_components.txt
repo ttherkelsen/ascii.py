@@ -1,0 +1,85 @@
+Always subclass Component (either directly or indirectly through a subclass that does).
+
+Put a docstring at the top of your class that briefly explains the purpose of the component.
+
+Methods you'll want to override:
+
+__init__(self, /, *, your_named_parameters..., **name_of_parent_class)
+
+  To avoid issues with components that may wish to subclass your
+  component, always follow the above format.  Put a comment next to each
+  of the parameters, explaining briefly what it does.  You must call
+  super().__init__().
+
+  Here is an example (from the Fill() component):
+
+      def __init__(
+              self, /, *,
+              cell,        # Mandatory -- the cell used to fill with
+              **component,
+      ):
+          super().__init__(**component)
+          self.cell = cell
+
+update_xxx(self, value, lazy=False)
+
+  For every parameter you define for your component, you must define
+  an update_xxx() (where xxx is the name of your parameter) method.
+  The job of this method is to update the relevant name in self.cells
+  with a CellUpdate object reflecting the new state of the component.
+  Return a boolean true value if updating the value should trigger a
+  new layout workflow.  Any boolean false value (including not
+  returning a value, technically returning None) will not trigger the
+  layout workflow.
+
+  The lazy parameter, if set to True, means "do not update unless the
+  name does not current exist, or has the value None".  This is
+  typically only used by the shared data (like theme) from Screen
+  which gets applied to every Panel (and thus every child component
+  added to those) at initialisation.  This allows components to set
+  the value without it being overwritten by the Screen setup process
+  later.
+
+  NOTE: To update a value of a component parameter outside of
+  __init__(), you *MUST* always use component.update(name, value)!
+
+
+
+layout_hint(self, size)
+
+  This method is called to give your component a chance to negotiate
+  sizing.  The passed size is the maximum size; the method should return
+  the minimum size that your component can have.  Usually you want to
+  use something like this:
+
+      def layout_hint(self, size):
+          s = ... Size(w, h) object based on parameters set in __init__ ...
+          return super().layout_hint(size) + s
+
+  NO changes to component data should be done from this method.
+
+
+layout_done(self, bbox)
+
+  Once the layout manager has gathered information about the sizes of
+  its child components, it will then call this method on each of them,
+  passing a bbox (position and size).  This bbox is the rendering space
+  your component has.
+
+  This is the time where you actually do the work of constructing your
+  components rendering.  You *must* assign CellUpdate objects to names
+  (recommend using "main") in the self.cells object, and then call
+  your parent's layout_done() method.
+
+  Example (from the Fill() component):
+
+      def layout_done(self, bbox):
+          self.cells.main = cell.BBoxFill(cells=self.cell, bbox=bbox)
+          super().layout_done(bbox)
+
+render(self)
+
+  You typically do not need to override this method, unless there's
+  something you want your component to do every time the render
+  workflow is called.
+
