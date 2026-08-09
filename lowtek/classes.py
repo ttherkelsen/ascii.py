@@ -1,7 +1,8 @@
 # Various utlity and helper classes which are too small to justify having their
 # own file
 
-class 
+class Frame:
+    ...
 
 class Size:
     def __init__(self, w, h):
