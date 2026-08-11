@@ -1,6 +1,6 @@
 from lowtek.surface import Surface
 from lowtek import UI
-from lowtek.classes import BBox, Size, Frame, FrameLD
+from lowtek.classes import BBox, Size, Margin, Border
 from lowtek.cell import Cell, CellHint
 from lowtek.colours import Colours
 from lowtek import utils
@@ -24,7 +24,7 @@ def run(*args):
                 layout = UI.layout.Absolute(),
                 children = [
                     UI.Fill(
-                        margin=Frame(
+                        margin=Margin(
                             n=1,
                             s=CellHint(cell=Cell(" ", Colours("#c0ffc0ff", "#333333ff"))),
                             e=CellHint(cell=Cell(" ", Colours("#c0c0ffff", "#333333ff")), hint=2),
@@ -42,7 +42,7 @@ def run(*args):
                 layout = UI.layout.Absolute(),
                 children = [
                     UI.Fill(
-                        border=FrameLD(
+                        border=Border(
                             n="s", s="d",
                             e="d", w="s",
                         ),

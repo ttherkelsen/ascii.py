@@ -1,7 +1,9 @@
 TODO:
+- how should a component trigger a re-layout workflow?
 - moving panels around
 - user interaction framework (needed for windows, buttons, etc)
 - layout managers (Row, Column, etc)
+- refactor cell.py and classes.py into cell/* and classes/*?
 - Do pythonic type hints
 - bdf2lgf conversion tool
 - test of fonts with depth > 1 (multicolour)

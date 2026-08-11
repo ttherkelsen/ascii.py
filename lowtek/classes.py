@@ -122,7 +122,10 @@ class Frame(Core):
             return cls(nesw=dirs)
         return cls(**dict(zip(order, dirs)))
 
-class FrameLD(Frame):
+Margin = Frame
+Padding = Frame
+
+class Border(Frame):
     LD = {
         'n': 'B N N',
         's': 'B S S',

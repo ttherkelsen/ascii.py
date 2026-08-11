@@ -1,6 +1,6 @@
 from .. import cell
 from .. import const
-from ..classes import Size, Frame, FrameLD
+from ..classes import Size, Margin, Padding, Border
 
 
 class Component:
@@ -20,9 +20,9 @@ class Component:
     ):
         self.align = align
         self.valign = valign
-        self.border = FrameLD.from_str(border) if isinstance(border, str) else border
-        self.margin = Frame.from_int(margin) if isinstance(margin, int) else margin
-        self.padding = Frame.from_int(padding) if isinstance(padding, int) else padding
+        self.border = Border.from_str(border) if isinstance(border, str) else border
+        self.margin = Margin.from_int(margin) if isinstance(margin, int) else margin
+        self.padding = Padding.from_int(padding) if isinstance(padding, int) else padding
         self.sizing = sizing
         self.bbox = bbox
         self.fill = fill
@@ -78,21 +78,11 @@ class Component:
         # Fixme: Scrollbar support, for now always just truncate
         self._bbox = bbox
 
-        if self.padding:
-            padding = self.padding.layout_done(bbox, self.theme)
-            self.cells.padding = cell.Frame(bbox=bbox, frame=padding)
-            bbox = bbox + padding.to_position() - padding.to_size()
-
-        if self.border:
-            border = self.border.layout_done(bbox, self.theme)
-            self.cells.border = cell.Frame(bbox=bbox, frame=border)
-            bbox = bbox + border.to_position() - border.to_size()
-            
-        if self.margin:
-            margin = self.margin.layout_done(bbox, self.theme)
-            self.cells.margin = cell.Frame(bbox=bbox, frame=margin)
-            bbox = bbox + margin.to_position() - margin.to_size()
-
+        for decoration in ('padding', 'border', 'margin'): # Order is important!
+            if dec := getattr(self, decoration):
+                dec = dec.layout_done(bbox, self.theme)
+                setattr(self.cells, decoration, cell.Frame(bbox=bbox, frame=dec))
+                bbox = bbox + dec.to_position() - dec.to_size()
 
         if self.fill and hasattr(self.cells, "component_fill"):
             print(self.cells, dir(self.cells))
