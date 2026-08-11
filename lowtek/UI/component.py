@@ -85,7 +85,6 @@ class Component:
                 bbox = bbox + dec.to_position() - dec.to_size()
 
         if self.fill and hasattr(self.cells, "component_fill"):
-            print(self.cells, dir(self.cells))
             del self.cells.component_fill
             
         return bbox
