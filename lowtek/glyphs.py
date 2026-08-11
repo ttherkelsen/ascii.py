@@ -161,4 +161,6 @@ GLYPHS = {
     'Br   ': 0x2575,
     'B r  ': 0x2576,
     'B  r ': 0x2577,
+
+    # FIXME: Duplications for the corners of dashed lines similar to rounded LD
 }

@@ -1,5 +1,4 @@
 TODO:
-- border/margin/padding
 - make CellPosition take a Position object instead of x, y args?
 - moving panels around
 - user interaction framework (needed for windows, buttons, etc)
@@ -9,6 +8,7 @@ TODO:
 - test of fonts with depth > 1 (multicolour)
 
 DONE:
+- border/margin/padding (mostly done, certain exotic LD combinations not supported -- yet)
 - Containers should not use CellUpdates but just add to the Component CellUpdates
 - Rename CellUpdateXXX to XXX and cleanup old code from cell.py
 - always use named arguments for cells/component classes

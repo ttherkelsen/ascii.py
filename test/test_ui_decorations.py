@@ -43,7 +43,8 @@ def run(*args):
                 children = [
                     UI.Fill(
                         border=FrameLD(
-                            n="s",
+                            n="s", s="d",
+                            e="d", w="s",
                         ),
                         cell=Cell("b", Colours('#ffc0c0ff', '#333333ff')),
                     )

@@ -1,6 +1,6 @@
 import abc
 
-from .classes import Position
+from .classes import Position, FrameLD
 from .glyphs import GLYPHS
 
 class Cell:

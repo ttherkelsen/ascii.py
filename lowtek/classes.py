@@ -59,7 +59,7 @@ class Frame(Core):
             if self.n and self.is_before("nw"):
                 b += Position(x=0, y=self.n.hint)
                 b -= Size(w=0, h=self.n.hint)
-            if self.e and self.is_before("sw"):
+            if self.s and self.is_before("sw"):
                 b -= Size(w=0, h=self.s.hint)
             self.w.offset = b
         if self.e and self.e.offset is None:
@@ -67,7 +67,7 @@ class Frame(Core):
             if self.n and self.is_before("ne"):
                 b += Position(x=0, y=self.n.hint)
                 b -= Size(w=0, h=self.n.hint)
-            if self.e and self.is_before("se"):
+            if self.s and self.is_before("se"):
                 b -= Size(w=0, h=self.s.hint)
             self.e.offset = b
         
@@ -140,8 +140,8 @@ class FrameLD(Frame):
             return GLYPHS[temp.replace(dir.upper(), getattr(self, dir))]
 
         if getattr(self, dir[0]) and getattr(self, dir[1]):
-            temp = temp.replace(dir[0].upper(), getattr(self, dir[0]))
-            temp = temp.replace(dir[1].upper(), getattr(self, dir[1]))
+            temp = temp.replace(dir[0].upper(), getattr(self, dir[1]))
+            temp = temp.replace(dir[1].upper(), getattr(self, dir[0]))
         elif getattr(self, dir[0]):
             temp = self.LD[dir[0]]
             temp = temp.replace(dir[0].upper(), getattr(self, dir[0]))
@@ -187,10 +187,10 @@ class FrameLD(Frame):
                 set_value(d, value)
 
         for d in ('nw', 'ne', 'sw', 'se'):
-            if getattr(self, d[0]) or getattr(self, d[1]):
+            if getattr(clone, d[0]) or getattr(clone, d[1]):
                 set_value(d, d)
             else:
-                setattr(self, d, None)
+                setattr(clone, d, None)
 
         clone.update_offsets(bbox)
         clone.order = ('n', 'e', 's', 'w', 'nw', 'ne', 'sw', 'se')
