@@ -1,6 +1,6 @@
 TODO:
 - refactor CellUpdates to use add/set/remove methods for adding CU objects so you don't get namespace clashes with methods
-- how should a component trigger a re-layout workflow?
+- how should a component trigger a re-layout workflow?  Can we always rely on it being triggered through screen.update()?
 - moving panels around
 - user interaction framework (needed for windows, buttons, etc)
 - layout managers (Row, Column, etc)

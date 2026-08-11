@@ -120,12 +120,13 @@ class CrossLD(CellUpdate):
             
 class CellUpdates:
     def __init__(self, childupdates=None):
+        self.cus = {}
         if childupdates is not None:
             for idx, c in enumerate(childupdates):
-                setattr(self, str(idx), c)
+                self.cus[idx] = c
                 
     def __iter__(self):
-        for name, cu in self.__dict__.items():
+        for name, cu in self.cus.items():
             if isinstance(cu, CellUpdate) and cu.dirty:
                 yield cu
             elif isinstance(cu, CellUpdates):
@@ -134,6 +135,17 @@ class CellUpdates:
                 for cuu in cu:
                     yield cuu
 
+    def add(self, name, cu):
+        if name in self.cus:
+            raise ValueError(f"{name} already exists")
+        self.cus[name] = cu
+
+    def set(self, name, cu):
+        self.cus[name] = cu
+
+    def remove(self, name, cu):
+        del self.cus[name]
+                    
     def crop(self, composite):
         for cu in self:
             for cp in cu:

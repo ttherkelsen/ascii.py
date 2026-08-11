@@ -35,7 +35,8 @@ class Screen:
             panel.update("theme", self.theme, lazy=True)
 
     def update(self, cname, name, value, lazy=False):
-        self.names[cname].update(name, value, lazy)
+        if self.names[cname].update(name, value, lazy):
+            self.layout_required = True # FIXME: Only the panel that contained the changed component needs re-layout
         
     @property
     def size(self):
@@ -54,12 +55,9 @@ class Screen:
         # FIXME: It should be possible to move part of this to the layout phase?
         composite = set()
         for panel in self.ui[::-1]:
-            updated = 0
             update = panel.render()
             for cp in update.crop(composite): # Remove cells that overlap with previously rendered panels
                 self.cells.update(cp)
-                updated += 1
-            #print(updated, "cells updated")
-            composite |= panel.bbox.to_composite()
+            composite |= panel._composite # Minor optimisation
 
         self.surface.update(self.cells.get_dirty())

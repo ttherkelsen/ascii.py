@@ -29,3 +29,4 @@ class Panel(Container):
 
     def layout_done(self, bbox):
         super().layout_done(self.bbox)
+        self._composite = self.bbox.to_composite()
