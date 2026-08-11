@@ -69,5 +69,5 @@ class Surface:
     def update(self, cu):
         for cp in cu:
             glyph = self.font.render_glyph(cp.cell)
-            self.ctx.putImageData(glyph, cp.x*self.font.width, cp.y*self.font.height)
+            self.ctx.putImageData(glyph, cp.pos.x*self.font.width, cp.pos.y*self.font.height)
             

@@ -1,6 +1,6 @@
 import abc
 
-from .classes import Position, FrameLD
+from .classes import Position
 from .glyphs import GLYPHS
 
 class Cell:
@@ -18,18 +18,13 @@ class CellHint:
         self.offset = offset
 
 class CellPosition:
-    def __init__(self, cell, x, y):
+    def __init__(self, cell, pos):
         self.cell = cell
-        self.x = x
-        self.y = y
+        self.pos = pos
 
     def __str__(self):
-        return f"CellPosition @ {id(self)} {self.cell=} {self.x=} {self.y=}"
+        return f"CellPosition @ {id(self)} {self.cell=} {self.pos=}"
     __repr__ = __str__
-
-    @classmethod
-    def offset(cls, pos, cell, x, y):
-        return cls(cell, pos.x + x, pos.y + y)
         
 class CellUpdate(abc.ABC):
     def __init__(self, cells, pos=None):
@@ -66,25 +61,25 @@ class BBox(CellUpdate):
         idx = 0
         for yy in range(self.bbox.h):
             for xx in range(self.bbox.w):
-                yield CellPosition(self.cells[idx], self.bbox.x + xx, self.bbox.y + yy)
+                yield CellPosition(self.cells[idx], Position(self.bbox.x + xx, self.bbox.y + yy))
                 idx += 1
 
 class BBoxFill(BBox):
     def iter(self):
         for yy in range(self.bbox.h):
             for xx in range(self.bbox.w):
-                yield CellPosition(self.cells, self.bbox.x + xx, self.bbox.y + yy)
+                yield CellPosition(self.cells, Position(self.bbox.x + xx, self.bbox.y + yy))
         
 class Row(CellUpdate):
     def iter(self):
         for idx, cell in enumerate(self.cells):
-            yield CellPosition.offset(self.pos, self.cells[idx], idx, 0)
+            yield CellPosition(self.cells[idx], Position(idx, 0) + self.pos)
 
 class Column(CellUpdate):
     def iter(self):
         for idx, cell in enumerate(self.cells):
-            yield CellPosition.offset(self.pos, self.cells[idx], 0, idx)
-                
+            yield CellPosition(self.cells[idx], Position(0, idx) + self.pos)
+            
 class Composite(CellUpdate):
     def __init__(self, composite, **cellupdate):
         super().__init__(**cellupdate)
@@ -92,7 +87,7 @@ class Composite(CellUpdate):
 
     def iter(self):
         for x, y in self.composite:
-            yield CellPosition(self.cells, x, y)
+            yield CellPosition(self.cells, Position(x, y))
 
 class Frame(BBox):
     def __init__(self, frame, **bbox):
@@ -103,7 +98,7 @@ class Frame(BBox):
         for d in self.frame:
             for y in range(d.offset.h):
                 for x in range(d.offset.w):
-                    yield CellPosition(d.cell, self.bbox.x + d.offset.x + x, self.bbox.y + d.offset.y + y)
+                    yield CellPosition(d.cell, Position(self.bbox.x + d.offset.x + x, self.bbox.y + d.offset.y + y))
 
 class CrossLD(CellUpdate):
     def __init__(self, size, colours, center=None, pos=None):
@@ -117,11 +112,11 @@ class CrossLD(CellUpdate):
     def iter(self):
         for x in range(self.size.w):
             if x != self.center.x:
-                yield CellPosition.offset(self.pos, self.hline, x, self.center.y)
+                yield CellPosition(self.hline, Position(x, self.center.y) + self.pos)
         for y in range(self.size.h):
             if y != self.center.y:
-                yield CellPosition.offset(self.pos, self.vline, self.center.x, y)
-        yield CellPosition.offset(self.pos, self.cross, self.center.x, self.center.y)
+                yield CellPosition(self.vline, Position(self.center.x, y) + self.pos)
+        yield CellPosition(self.cross, Position(self.center.x, self.center.y) + self.pos)
             
 class CellUpdates:
     def __init__(self, childupdates=None):
@@ -142,7 +137,7 @@ class CellUpdates:
     def crop(self, composite):
         for cu in self:
             for cp in cu:
-                if (cp.x, cp.y) not in composite:
+                if (cp.pos.x, cp.pos.y) not in composite:
                     yield cp
 
     def fill(self, bbox):
@@ -151,7 +146,7 @@ class CellUpdates:
             for cp in cu:
                  # We intentionally use remove because no component
                  # should ever render to any cell position more than
-                 # once.
+                 # once, so if it happens, we want this to catch it.
                 composite.remove((cp.x, cp.y))
             cu.dirty = True
         return composite
@@ -172,5 +167,5 @@ class CellGrid:
         self.dirty = []
         
     def update(self, cp):
-        self.grid[cp.y][cp.x] = cp.cell
+        self.grid[cp.pos.y][cp.pos.x] = cp.cell
         self.dirty.append(cp)
