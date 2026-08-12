@@ -20,6 +20,6 @@ class Absolute:
     def done(self, bbox, children):
         for c in children:
             if c.bbox:
-                c.bbox += bbox.to_position()
+                c.bbox += bbox.to_position()  # FIXME: layout cannot alter bbox -- need new variable
             c.layout_done(c.bbox or bbox)
     

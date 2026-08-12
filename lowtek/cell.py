@@ -160,7 +160,7 @@ class CellUpdates:
                  # We intentionally use remove because no component
                  # should ever render to any cell position more than
                  # once, so if it happens, we want this to catch it.
-                composite.remove((cp.x, cp.y))
+                composite.remove((cp.pos.x, cp.pos.y))
             cu.dirty = True
         return composite
                     

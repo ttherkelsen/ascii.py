@@ -24,6 +24,10 @@ class Screen:
         self.cells = CellGrid(size=self.size)
         self.layout_required = True
 
+    @property
+    def size(self):
+        return self.surface.size
+    
     def get_names(self):
         names = {}
         for panel in self.ui:
@@ -37,11 +41,14 @@ class Screen:
     def update(self, cname, name, value, lazy=False):
         if self.names[cname].update(name, value, lazy):
             self.layout_required = True # FIXME: Only the panel that contained the changed component needs re-layout
+
+    def move(self, cname, pos):
+        print(self.names[cname].bbox)
+        self.names[cname].bbox += pos
+        print(self.names[cname].bbox)
+        self.layout_required = True
         
-    @property
-    def size(self):
-        return self.surface.size
-        
+            
     def layout(self):
         for panel in self.ui:
             panel.layout_hint(self.surface.size)

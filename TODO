@@ -1,6 +1,4 @@
 TODO:
-- refactor CellUpdates to use add/set/remove methods for adding CU objects so you don't get namespace clashes with methods
-- how should a component trigger a re-layout workflow?  Can we always rely on it being triggered through screen.update()?
 - moving panels around
 - user interaction framework (needed for windows, buttons, etc)
 - layout managers (Row, Column, etc)
@@ -10,6 +8,9 @@ TODO:
 - test of fonts with depth > 1 (multicolour)
 
 DONE:
+- how should a component trigger a re-layout workflow?  For now we are defining that a component cannot trigger
+  a re-layout internally; it can only happen through a call to screen.update().
+- refactor CellUpdates to use dict API for adding CU objects so you don't get namespace clashes with methods
 - make CellPosition take a Position object instead of x, y args
 - border/margin/padding (mostly done, certain exotic LD combinations not supported -- yet)
 - Containers should not use CellUpdates but just add to the Component CellUpdates
