@@ -12,12 +12,12 @@ class Fill(Component):
         self.cell = cell
 
     def update_cell(self, value, lazy=False):
-        self.cells.main.cells = value
+        self.cells['main'].cells = value
         return False
         
     def layout_done(self, bbox):
         cbbox = super().layout_done(bbox)
-        self.cells.main = cell.BBoxFill(cells=self.cell, bbox=cbbox)
+        self.cells['main'] = cell.BBoxFill(cells=self.cell, bbox=cbbox)
         
 
     

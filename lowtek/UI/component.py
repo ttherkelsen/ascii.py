@@ -81,19 +81,19 @@ class Component:
         for decoration in ('padding', 'border', 'margin'): # Order is important!
             if dec := getattr(self, decoration):
                 dec = dec.layout_done(bbox, self.theme)
-                setattr(self.cells, decoration, cell.Frame(bbox=bbox, frame=dec))
+                self.cells[decoration] = cell.Frame(bbox=bbox, frame=dec)
                 bbox = bbox + dec.to_position() - dec.to_size()
 
-        if self.fill and hasattr(self.cells, "component_fill"):
-            del self.cells.component_fill
+        if self.fill and "component_fill" in self.cells:
+            del self.cells['component_fill']
             
         return bbox
 
 
     def render(self):
-        if self.fill and not hasattr(self.cells, "component_fill"):
+        if self.fill and "component_fill" not in self.cells:
             if composite := self.cells.fill(self._bbox):
-                self.cells.component_fill = cell.Composite(cells=self.fill, composite=composite)
+                self.cells['component_fill'] = cell.Composite(cells=self.fill, composite=composite)
             
         return self.cells
 

@@ -20,7 +20,7 @@ class GlyphPage(Component):
         return self.SIZE
 
     def layout_done(self, bbox):
-        self.cells.main = cell.CellUpdates([
+        self.cells['main'] = cell.CellUpdates([
             cell.CrossLD(
                 pos=bbox.to_position(),
                 size=self.SIZE,

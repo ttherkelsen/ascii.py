@@ -74,7 +74,7 @@ layout_done(self, bbox)
   Example (from the Fill() component):
 
       def layout_done(self, bbox):
-          self.cells.main = cell.BBoxFill(cells=self.cell, bbox=bbox)
+          self.cells['main'] = cell.BBoxFill(cells=self.cell, bbox=bbox)
           super().layout_done(bbox)
 
 render(self)

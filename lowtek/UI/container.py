@@ -37,6 +37,6 @@ class Container(Component):
         pbbox = super().layout_done(bbox)
         self.layout.done(pbbox, self.children)
         for idx, child in enumerate(self.children):
-            setattr(self.cells, f"child_{idx}", child.render())
+            self.cells[f"child_{idx}"] = child.render()
 
     

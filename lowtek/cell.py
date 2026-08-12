@@ -135,16 +135,17 @@ class CellUpdates:
                 for cuu in cu:
                     yield cuu
 
-    def add(self, name, cu):
-        if name in self.cus:
-            raise ValueError(f"{name} already exists")
-        self.cus[name] = cu
+    def __getitem__(self, key):
+        return self.cus[key]
 
-    def set(self, name, cu):
-        self.cus[name] = cu
+    def __setitem__(self, key, value):
+        self.cus[key] = value
 
-    def remove(self, name, cu):
-        del self.cus[name]
+    def __delitem__(self, key):
+        del self.cus[key]
+
+    def __contains__(self, key):
+        return key in self.cus
                     
     def crop(self, composite):
         for cu in self:
