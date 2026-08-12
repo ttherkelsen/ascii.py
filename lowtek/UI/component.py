@@ -84,16 +84,16 @@ class Component:
                 self.cells[decoration] = cell.Frame(bbox=bbox, frame=dec)
                 bbox = bbox + dec.to_position() - dec.to_size()
 
-        if self.fill and "component_fill" in self.cells:
-            del self.cells['component_fill']
+        if self.fill and "fill" in self.cells:
+            del self.cells['fill']
             
         return bbox
 
 
     def render(self):
-        if self.fill and "component_fill" not in self.cells:
+        if self.fill and "fill" not in self.cells:
             if composite := self.cells.fill(self._bbox):
-                self.cells['component_fill'] = cell.Composite(cells=self.fill, composite=composite)
+                self.cells['fill'] = cell.Composite(cells=self.fill, composite=composite)
             
         return self.cells
 
