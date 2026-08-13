@@ -11,6 +11,13 @@ class Cell:
 def str2cells(text, colours):
     return [ Cell(t, colours) for t in text ]
 
+def ints2cells(ints, colours):
+    cells = []
+    for ii in ints:
+        for i in ii:
+            cells.append(Cell(i, colours))
+    return cells
+
 class CellHint:
     def __init__(self, cell, hint=1, offset=None):
         self.cell = cell

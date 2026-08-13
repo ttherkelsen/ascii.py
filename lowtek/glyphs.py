@@ -19,6 +19,8 @@
 # 6 - thick 3-dotted line
 # 7 - thick 4-dotted line
 
+WIDE = 0x1000000
+
 GLYPHS = {
     'B s s': 0x2500,
     'B t t': 0x2501,

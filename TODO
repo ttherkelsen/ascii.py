@@ -8,6 +8,8 @@ TODO:
 - test of fonts with depth > 1 (multicolour)
 
 DONE:
+- add hex2pickle support tool (experimental wide glyph support)
+- add .gz support to bdf2pickle support tool
 - how should a component trigger a re-layout workflow?  For now we are defining that a component cannot trigger
   a re-layout internally; it can only happen through a call to screen.update().
 - refactor CellUpdates to use dict API for adding CU objects so you don't get namespace clashes with methods

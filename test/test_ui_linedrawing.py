@@ -9,9 +9,14 @@ import js
 def run(*args):
     size = Size(80, 40)
     theme = UI.LightTheme()
+
+    #surface = Surface('canvas', 'unscii_full_8x16', size)
+    surface = Surface('canvas', 'unifont_all_8x16w', size)
+    #surface = Surface('canvas', 'ucs_9x15', size)
+
     screen = UI.Screen(
-        surface = Surface('canvas', 'ucs_9x15', size),
         theme = theme,
+        surface = surface,
         ui = [
             UI.Panel(
                 bbox = size.to_bbox(),
@@ -19,10 +24,10 @@ def run(*args):
                 children =[ UI.Fill(cell=Cell(theme.background, theme.colours.background)) ],
             ),
             UI.Panel(
-                bbox = BBox(20, 3, 38, 34),
+                bbox = BBox(12, 3, 56, 34),
                 fill = Cell(theme.panel_background, theme.colours.panel_background),
                 layout = UI.layout.Absolute(),
-                children = [ UI.GlyphPage(page=0x2500) ],
+                children = [ UI.GlyphPage(page=0x2500, font=surface.font) ],
             ),
         ],
     )

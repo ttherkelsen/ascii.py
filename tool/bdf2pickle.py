@@ -4,36 +4,46 @@
 #     for later loading
 #
 
-import argparse, re, os.path, pickle
+import argparse, re, os.path, pickle, gzip
 
 def run():
-    cmdline = argparse.ArgumentParser(description="Convert BDF files into pickles.")
-    cmdline.add_argument('-d', '--destdir', help='Which directory to write the files to, defaults to current dir.', default=".")
-    cmdline.add_argument('bdffile', help='BDF file to convert')
+    cmdline = argparse.ArgumentParser(description="Convert a BDF file into a pickle in current directory.")
+    cmdline.add_argument('bdffile', help='BDF file to convert, file can end in .gz and will be uncompressed in memory')
+    cmdline.add_argument('fontname', help='Name of the font, <bdffile until first . in filename>.', default=None, nargs="?")
     args = cmdline.parse_args()
 
-    convert(args.bdffile, args.destdir)
+    convert(args.bdffile, args.fontname)
 
-def convert(bdf, destdir):
+def convert(bdf, fontname):
     RE = r'STARTCHAR (\S+).+?ENCODING (\S+).+?BBX (\d+) (\d+).+?BITMAP\s+(.*?)\s+ENDCHAR'
-    fontname = os.path.basename(bdf).split(".")[0]
+    if fontname is None:
+        fontname = os.path.basename(bdf).split(".")[0]
+        
     glyphs = {}
 
+    if bdf.endswith(".gz"):
+        with gzip.open(bdf, 'rb') as FD:
+            data = FD.read().decode()
+    else:
+        with open(bdf, 'r') as FD:
+            data = FD.read()
+        
+    
     # FIXME: We assume that the BDF font format has the same size
     # bitmap for all font glyphs.  Is this a safe assumption?
-    with open(bdf, 'r') as fd:
-        for match in re.finditer(RE, fd.read(), re.DOTALL):
-            name, encoding, width, height, bitmap = match.groups()
-            encoding = int(encoding)
-            width = int(width)
-            height = int(height)
-            shift = 8 - (width % 8)
-            bitmap = [ int(t, 16) >> shift for t in bitmap.split("\n") ]
+    for match in re.finditer(RE, data, re.DOTALL):
+        name, encoding, width, height, bitmap = match.groups()
+        encoding = int(encoding)
+        width = int(width)
+        height = int(height)
+        shift = 8 - (width % 8)
+        bitmap = [ int(t, 16) >> shift for t in bitmap.split("\n") ]
 
-            if len(bitmap) != height:
-                raise ValueError(f"{name} bitmap has wrong size")
+        if len(bitmap) != height:
+            raise ValueError(f"{name} bitmap has wrong size")
           
-            glyphs[encoding] = bitmap
+        glyphs[encoding] = bitmap
+        print(f"{encoding:x}")
 
     data = (
         fontname,
@@ -42,7 +52,7 @@ def convert(bdf, destdir):
         1,
         glyphs,
     )
-    with open(os.path.join(destdir, f"{fontname}.pickle"), 'wb') as fd:
+    with open(f'{fontname}.pickle', 'wb') as fd:
         pickle.dump(data, fd)
 
 if __name__ == '__main__':
