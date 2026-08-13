@@ -1,9 +1,11 @@
 TODO:
-- moving panels around
+- moving panels around (requires component layout bbox support)
 - user interaction framework (needed for windows, buttons, etc)
 - layout managers (Row, Column, etc)
 - refactor cell.py and classes.py into cell/* and classes/*?
 - Do pythonic type hints
+- rewrite GlyphPage to be less of a hack
+- support for gz compression of fonts?
 - bdf2lgf conversion tool
 - test of fonts with depth > 1 (multicolour)
 
