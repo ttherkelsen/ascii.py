@@ -32,6 +32,9 @@ class CellPosition:
     def __str__(self):
         return f"CellPosition @ {id(self)} {self.cell=} {self.pos=}"
     __repr__ = __str__
+
+    def to_tuple(self):
+        return (self.pos.x, self.pos.y)
         
 class CellUpdate(abc.ABC):
     def __init__(self, cells, pos=None):
@@ -154,11 +157,11 @@ class CellUpdates:
     def __contains__(self, key):
         return key in self.cus
                     
-    def crop(self, composite):
-        for cu in self:
-            for cp in cu:
-                if (cp.pos.x, cp.pos.y) not in composite:
-                    yield cp
+#    def crop(self, composite):
+#        for cu in self:
+#            for cp in cu:
+#                if (cp.pos.x, cp.pos.y) not in composite:
+#                    yield cp
 
     def fill(self, bbox):
         composite = bbox.to_composite()
@@ -167,8 +170,8 @@ class CellUpdates:
                  # We intentionally use remove because no component
                  # should ever render to any cell position more than
                  # once, so if it happens, we want this to catch it.
-                composite.remove((cp.pos.x, cp.pos.y))
-            cu.dirty = True
+                composite.remove(cp.to_tuple())
+        self.dirty()
         return composite
                     
     def dirty(self, state=True): # FIXME: Should this be a property instead?  If not should be renamed to set_dirty

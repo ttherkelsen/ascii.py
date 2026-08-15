@@ -36,7 +36,10 @@ class Container(Component):
     def layout_done(self, bbox):
         pbbox = super().layout_done(bbox)
         self.layout.done(pbbox, self.children)
-        for idx, child in enumerate(self.children):
-            self.cells[f"child_{idx}"] = child.render()
+
+    def render(self):
+        yield from super().render()
+        for child in self.children:
+            yield from child.cells
 
     

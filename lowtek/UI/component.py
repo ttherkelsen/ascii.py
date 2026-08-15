@@ -95,5 +95,5 @@ class Component:
             if composite := self.cells.fill(self._bbox):
                 self.cells['fill'] = cell.Composite(cells=self.fill, composite=composite)
             
-        return self.cells
+        yield from self.cells
 

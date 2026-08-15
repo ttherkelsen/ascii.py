@@ -62,9 +62,11 @@ class Screen:
         # FIXME: It should be possible to move part of this to the layout phase?
         composite = set()
         for panel in self.ui[::-1]:
-            update = panel.render()
-            for cp in update.crop(composite): # Remove cells that overlap with previously rendered panels
-                self.cells.update(cp)
+            for cu in panel.render():
+                for cp in cu:
+                    # Remove cells that overlap with previously rendered panels
+                    if cp.to_tuple() not in composite:
+                        self.cells.update(cp)
             composite |= panel._composite # Minor optimisation
 
         self.surface.update(self.cells.get_dirty())
