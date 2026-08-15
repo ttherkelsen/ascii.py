@@ -1,5 +1,5 @@
 TODO:
-- mouse tracking
+- button component
 - user interaction framework (needed for windows, buttons, etc)
 - layout managers (Row, Column, etc)
 - refactor cell.py and classes.py into cell/* and classes/*?
@@ -10,6 +10,7 @@ TODO:
 - test of fonts with depth > 1 (multicolour)
 
 DONE:
+- mouse tracking
 - basic event subscription for key presses (keydown/keyup)
 - moving panels around (done by adjusting cellupdate.pos)
 - add hex2pickle support tool (experimental wide glyph support)
