@@ -1,6 +1,4 @@
-from . import utils
-
-# Fixme: Find way to make it so that for a given list of colours, the resulting
+# FIXME: Find way to make it so that for a given list of colours, the resulting
 # Colours object is always a singleton
 
 class Colours:

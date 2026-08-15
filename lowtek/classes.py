@@ -254,6 +254,12 @@ class Position(Core):
         return f"<Position @ {id(self)} {self.x=} {self.y=}"
     __repr__ = __str__
 
+    def __eq__(self, other):
+        if not isinstance(other, Position):
+            return NotImplemented
+            
+        return self.x == other.x and self.y == other.y
+    
     def __add__(self, other):
         if not isinstance(other, Position):
             return NotImplemented
@@ -333,6 +339,10 @@ class BBox(Position, Size):
             case _:
                 return NotImplemented
 
+    def set_position(self, pos):
+        self.x = pos.x
+        self.y = pos.y
+            
     def __str__(self):
         return f"<BBox @ {id(self)} {self.x=} {self.y=} {self.w=} {self.h=}"
     __repr__ = __str__

@@ -19,15 +19,25 @@ class Panel(Container):
     def __init__(
             self, /, *,
             bbox,
-            layer=None,
+            layer = None,
+            hidden = False,
             **container,
     ):
         super().__init__(**container)
         self.bbox = bbox
         self.layer = layer
+        self.hidden = hidden
 
+    def update_layer(self, value, lazy=False):
+        self.layer = value
+        return False
+
+    def update_hidden(self, value, lazy=False):
+        self.hidden = value
+        return False
+        
     def layout_hint(self, size):
-        super().layout_hint(self.bbox.to_size())
+        return super().layout_hint(self.bbox.to_size())
 
     def layout_done(self, bbox):
         super().layout_done(self.bbox)
@@ -36,7 +46,11 @@ class Panel(Container):
     def _update_composite(self):
         self._composite = self.bbox.to_composite()
         
-    def move(self, pos):
-        self.bbox += pos # FIXME: Check for out of bounds?  Or should this be done in calling screen?
+    def move(self, pos, relative=True):
+        # FIXME: Check for out of bounds?  Or should this be done in calling screen?
+        if relative:
+            self.bbox += pos
+        else:
+            self.bbox.set_position(pos)
         self._update_composite()
-        super().move(pos)
+        super().move(pos, relative)

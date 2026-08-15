@@ -48,6 +48,7 @@ class Surface:
         }
             
         self.div.append(canvas)
+        self.canvas = canvas
         
         # Keep local proxy of canvas 2d context
         self.ctx = canvas._dom_element.getContext("2d")

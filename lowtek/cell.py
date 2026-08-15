@@ -177,9 +177,12 @@ class CellUpdates:
                 composite.remove(cp.to_tuple())
         return composite
 
-    def move(self, pos):
+    def move(self, pos, relative=True):
         for cu in self.iter(all=True, dirty=True):
-            cu.pos += pos
+            if relative:
+                cu.pos += pos
+            else:
+                cu.pos = pos
     
     def set_dirty(self, state=True):
         for cu in self.cus.values():

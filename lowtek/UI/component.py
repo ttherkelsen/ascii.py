@@ -92,8 +92,8 @@ class Component:
 
         return bbox
 
-    def move(self, pos):
-        self.cells.move(pos)
+    def move(self, pos, relative=True):
+        self.cells.move(pos, relative)
 
     def render(self, all=False):
         if self.fill and "fill" not in self.cells:

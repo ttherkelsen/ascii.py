@@ -3,6 +3,7 @@ from .theme import LightTheme, DarkTheme
 from .panel import Panel
 from .fill import Fill
 from .glyphpage import GlyphPage
+from .label import Label
 
 class layout:
     pass

@@ -37,10 +37,10 @@ class Container(Component):
         pbbox = super().layout_done(bbox)
         self.layout.done(pbbox, self.children)
 
-    def move(self, pos):
-        super().move(pos)
+    def move(self, pos, relative=True):
+        super().move(pos, relative)
         for c in self.children:
-            c.move(pos)
+            c.move(pos, relative)
         
     def render(self, all=False):
         yield from super().render(all)

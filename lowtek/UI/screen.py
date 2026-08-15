@@ -28,9 +28,14 @@ class Screen:
         
         self.cells = CellGrid(size=self.size)
         self.layout_required = True
+        self.prevcursor = None
 
         js.addEventListener('keydown', self.event_keydown)
         js.addEventListener('keyup', self.event_keyup)
+        self.surface.canvas.addEventListener('mouseenter', self.event_mouseenter)
+        self.surface.canvas.addEventListener('mouseleave', self.event_mouseleave)
+        self.surface.canvas.addEventListener('mousemove', self.event_mousemove)
+        
 
     @property
     def size(self):
@@ -68,12 +73,36 @@ class Screen:
             self.layout_required = True # FIXME: Only the panel that contained the changed component needs re-layout
 
     def event_keydown(self, event):
-        #print(f"event_keydown {event.key=} {event.keyCode=} {event.charCode=} {event.code=}")
         self.check_subscriptions('keydown', event)
         event.stopPropagation();
         
     def event_keyup(self, event):
-        #print(f"event_keyup {event.key=} {event.keyCode=} {event.charCode=} {event.code=}")
+        self.check_subscriptions('keyup', event)
+        event.stopPropagation();
+
+    def event_mouseenter(self, event):
+        self.check_subscriptions('mouseenter', None)
+        event.stopPropagation();
+
+    def event_mousemove(self, event):
+        pos = Position(
+            x = event.offsetX // self.surface.font.width,
+            y = event.offsetY // self.surface.font.height,
+        )
+        if self.prevcursor != pos:
+            if self.prevcursor is not None:
+                self.check_subscriptions('mouseleavecell', self.prevcursor)
+            self.prevcursor = pos
+            self.check_subscriptions('mouseentercell', pos)
+            
+        event.stopPropagation();
+
+    def event_mouseleave(self, event):
+        if self.prevcursor is not None:
+            self.check_subscriptions('mouseleavecell', self.prevcursor)
+            self.prevcursor = None
+
+        self.check_subscriptions('mouseleave', None)
         event.stopPropagation();
             
     def shift_layer(self, cname, layer):
@@ -86,9 +115,9 @@ class Screen:
         self.update_layers()
         self.render(True)
             
-    def move_panel(self, cname, pos):
+    def move_panel(self, cname, pos, relative=True):
         # FIXME: Should this error if the found component is not a Panel (or subclass thereof)?
-        self.names[cname].move(pos)
+        self.names[cname].move(pos, relative)
 
         # FIXME: This could be optimised so that instead of rendering the entire component hierarchy, instead
         # we do:
@@ -110,6 +139,8 @@ class Screen:
         # FIXME: It should be possible to move part of this to the layout phase?
         composite = set()
         for panel in self.ui[::-1]:
+            if panel.hidden:
+                continue
             for cu in panel.render(all):
                 for cp in cu:
                     # Remove cells that overlap with previously rendered panels
