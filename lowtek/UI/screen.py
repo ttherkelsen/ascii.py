@@ -20,6 +20,7 @@ class Screen:
         self.names = self.get_names()
 
         self.update_theme()
+        self.update_layers(lazy=True)
         
         self.cells = CellGrid(size=self.size)
         self.layout_required = True
@@ -39,10 +40,28 @@ class Screen:
         for panel in self.ui:
             panel.update("theme", self.theme, lazy=True)
 
+    def update_layers(self, lazy=False):
+        layer = 0
+        for panel in self.ui:
+            panel.update("layer", layer, lazy=lazy)
+            layer = panel.layer + 1
+
+        self.ui.sort(key=lambda x: x.layer)
+
     def update(self, cname, name, value, lazy=False):
         if self.names[cname].update(name, value, lazy):
             self.layout_required = True # FIXME: Only the panel that contained the changed component needs re-layout
 
+    def shift_layer(self, cname, layer):
+        # See FIXMEs in move()
+        panel = self.names[cname]
+        panel.update('layer', layer)
+        idx = self.ui.index(panel)
+        del self.ui[idx]
+        self.ui.insert(layer, panel)
+        self.update_layers()
+        self.render(True)
+            
     def move(self, cname, pos):
         # FIXME: Should this error if the found component is not a Panel (or subclass thereof)?
         self.names[cname].move(pos)

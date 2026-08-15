@@ -47,5 +47,7 @@ def run(*args):
     screen.render()
     screen.move("d", Position(x=-13, y=-2))
     screen.render()
+    screen.shift_layer("d", 1)
+    screen.render()
 
 js.addEventListener('py:all-done', run)

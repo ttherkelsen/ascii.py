@@ -19,10 +19,12 @@ class Panel(Container):
     def __init__(
             self, /, *,
             bbox,
+            layer=None,
             **container,
     ):
         super().__init__(**container)
         self.bbox = bbox
+        self.layer = layer
 
     def layout_hint(self, size):
         super().layout_hint(self.bbox.to_size())
