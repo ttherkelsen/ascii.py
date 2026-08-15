@@ -5,6 +5,21 @@ from lowtek.cell import Cell
 
 import js
 
+def keypress(screen, event):
+    pos = Position(0, 0)
+    match event.key:
+        case 'ArrowLeft':
+            pos.x = -1
+        case 'ArrowRight':
+            pos.x = 1
+        case 'ArrowUp':
+            pos.y = -1
+        case 'ArrowDown':
+            pos.y = 1
+    if pos.x or pos.y:
+        screen.move_panel('d', pos)
+
+
 def run(*args):
     theme = UI.LightTheme()
     size = Size(80, 40)
@@ -42,6 +57,8 @@ def run(*args):
             ),
         ],
     )
+    screen.subscribe('keydown', keypress)
+    
     screen.render()
     screen.update("fill", "cell", Cell("z", theme.colours.text))
     screen.render()

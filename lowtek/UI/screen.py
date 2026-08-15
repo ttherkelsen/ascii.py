@@ -1,4 +1,7 @@
 from ..cell import CellGrid
+from ..classes import Position
+
+import js
 
 # Important note: Screen is not a component -- you cannot have a screen
 # inside a screen; it will always be the top node of your UI hierarchy.
@@ -18,18 +21,30 @@ class Screen:
         self.theme = theme
         self.ui = ui
         self.names = self.get_names()
+        self.subscriptions = {}
 
         self.update_theme()
         self.update_layers(lazy=True)
         
         self.cells = CellGrid(size=self.size)
         self.layout_required = True
-        self.rerender = False
+
+        js.addEventListener('keydown', self.event_keydown)
+        js.addEventListener('keyup', self.event_keyup)
 
     @property
     def size(self):
         return self.surface.size
-    
+
+    def subscribe(self, name, callback):
+         # FIXME: How to deal with multiple subs on same event?
+        self.subscriptions.setdefault(name, []).append(callback)
+
+    def check_subscriptions(self, name, event):
+        if name in self.subscriptions:
+            for cb in self.subscriptions[name]:
+                cb(self, event)
+        
     def get_names(self):
         names = {}
         for panel in self.ui:
@@ -52,6 +67,15 @@ class Screen:
         if self.names[cname].update(name, value, lazy):
             self.layout_required = True # FIXME: Only the panel that contained the changed component needs re-layout
 
+    def event_keydown(self, event):
+        #print(f"event_keydown {event.key=} {event.keyCode=} {event.charCode=} {event.code=}")
+        self.check_subscriptions('keydown', event)
+        event.stopPropagation();
+        
+    def event_keyup(self, event):
+        #print(f"event_keyup {event.key=} {event.keyCode=} {event.charCode=} {event.code=}")
+        event.stopPropagation();
+            
     def shift_layer(self, cname, layer):
         # See FIXMEs in move()
         panel = self.names[cname]
@@ -62,7 +86,7 @@ class Screen:
         self.update_layers()
         self.render(True)
             
-    def move(self, cname, pos):
+    def move_panel(self, cname, pos):
         # FIXME: Should this error if the found component is not a Panel (or subclass thereof)?
         self.names[cname].move(pos)
 

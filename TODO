@@ -1,5 +1,5 @@
 TODO:
-- moving panels around (requires component layout bbox support)
+- mouse tracking
 - user interaction framework (needed for windows, buttons, etc)
 - layout managers (Row, Column, etc)
 - refactor cell.py and classes.py into cell/* and classes/*?
@@ -10,6 +10,8 @@ TODO:
 - test of fonts with depth > 1 (multicolour)
 
 DONE:
+- basic event subscription for key presses (keydown/keyup)
+- moving panels around (done by adjusting cellupdate.pos)
 - add hex2pickle support tool (experimental wide glyph support)
 - add .gz support to bdf2pickle support tool
 - how should a component trigger a re-layout workflow?  For now we are defining that a component cannot trigger
