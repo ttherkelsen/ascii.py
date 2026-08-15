@@ -37,9 +37,14 @@ class Container(Component):
         pbbox = super().layout_done(bbox)
         self.layout.done(pbbox, self.children)
 
-    def render(self):
-        yield from super().render()
+    def move(self, pos):
+        super().move(pos)
+        for c in self.children:
+            c.move(pos)
+        
+    def render(self, all=False):
+        yield from super().render(all)
         for child in self.children:
-            yield from child.cells
+            yield from child.render(all)
 
     

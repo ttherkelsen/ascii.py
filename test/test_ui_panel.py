@@ -37,14 +37,15 @@ def run(*args):
                 name = 'd',
                 bbox = BBox(35, 10, 5, 5),
                 layout = UI.layout.Absolute(),
-                fill = Cell("d", theme.colours.text),
+                fill = Cell(theme.panel_background, theme.colours.text),
+                children=[ UI.Fill(cell=Cell("d", theme.colours.text), bbox=BBox(1, 1, 3, 3)) ],
             ),
         ],
     )
     screen.render()
     screen.update("fill", "cell", Cell("z", theme.colours.text))
     screen.render()
-    screen.move("d", Position(x=-5, y=-2))
+    screen.move("d", Position(x=-13, y=-2))
     screen.render()
 
 js.addEventListener('py:all-done', run)

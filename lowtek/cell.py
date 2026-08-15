@@ -58,6 +58,9 @@ class CellUpdate(abc.ABC):
             yield cp
         self.dirty = False
 
+    def set_dirty(self, state=True):
+        self.dirty = state
+        
     @abc.abstractmethod
     def iter(self):
         ... # Must be implemented in subclass
@@ -71,14 +74,14 @@ class BBox(CellUpdate):
         idx = 0
         for yy in range(self.bbox.h):
             for xx in range(self.bbox.w):
-                yield CellPosition(self.cells[idx], Position(self.bbox.x + xx, self.bbox.y + yy))
+                yield CellPosition(self.cells[idx], Position(self.bbox.x + xx, self.bbox.y + yy) + self.pos)
                 idx += 1
 
 class BBoxFill(BBox):
     def iter(self):
         for yy in range(self.bbox.h):
             for xx in range(self.bbox.w):
-                yield CellPosition(self.cells, Position(self.bbox.x + xx, self.bbox.y + yy))
+                yield CellPosition(self.cells, Position(self.bbox.x + xx, self.bbox.y + yy) + self.pos)
         
 class Row(CellUpdate):
     def iter(self):
@@ -97,7 +100,7 @@ class Composite(CellUpdate):
 
     def iter(self):
         for x, y in self.composite:
-            yield CellPosition(self.cells, Position(x, y))
+            yield CellPosition(self.cells, Position(x, y) + self.pos)
 
 class Frame(BBox):
     def __init__(self, frame, **bbox):
@@ -108,7 +111,7 @@ class Frame(BBox):
         for d in self.frame:
             for y in range(d.offset.h):
                 for x in range(d.offset.w):
-                    yield CellPosition(d.cell, Position(self.bbox.x + d.offset.x + x, self.bbox.y + d.offset.y + y))
+                    yield CellPosition(d.cell, Position(self.bbox.x + d.offset.x + x, self.bbox.y + d.offset.y + y) + self.pos)
 
 class CrossLD(CellUpdate):
     def __init__(self, size, colours, center=None, pos=None):
@@ -134,17 +137,24 @@ class CellUpdates:
         if childupdates is not None:
             for idx, c in enumerate(childupdates):
                 self.cus[idx] = c
-                
+
     def __iter__(self):
+        return self.iter()
+    
+    def iter(self, all=False, dirty=None):
         for name, cu in self.cus.items():
-            if isinstance(cu, CellUpdate) and cu.dirty:
+            if isinstance(cu, CellUpdate) and (all or cu.dirty):
                 yield cu
+                if dirty is not None:
+                    cu.set_dirty(dirty)
             elif isinstance(cu, CellUpdates):
                 # FIXME: Should not be necessary to nest CellUpdates as you can just assign
                 # to any value attribute you want?
                 for cuu in cu:
                     yield cuu
-
+                    if dirty is not None:
+                        cuu.set_dirty(dirty)
+                    
     def __getitem__(self, key):
         return self.cus[key]
 
@@ -157,26 +167,23 @@ class CellUpdates:
     def __contains__(self, key):
         return key in self.cus
                     
-#    def crop(self, composite):
-#        for cu in self:
-#            for cp in cu:
-#                if (cp.pos.x, cp.pos.y) not in composite:
-#                    yield cp
-
     def fill(self, bbox):
         composite = bbox.to_composite()
-        for cu in self:
+        for cu in self.iter(all=True, dirty=True):
             for cp in cu:
                  # We intentionally use remove because no component
                  # should ever render to any cell position more than
                  # once, so if it happens, we want this to catch it.
                 composite.remove(cp.to_tuple())
-        self.dirty()
         return composite
-                    
-    def dirty(self, state=True): # FIXME: Should this be a property instead?  If not should be renamed to set_dirty
-        for cu in self:
-            cu.dirty = state
+
+    def move(self, pos):
+        for cu in self.iter(all=True, dirty=True):
+            cu.pos += pos
+    
+    def set_dirty(self, state=True):
+        for cu in self.cus.values():
+            cu.set_dirty(state)
 
 class CellGrid:
     def __init__(self, size):
@@ -184,9 +191,8 @@ class CellGrid:
         self.grid = [ [ None ]*size.w for t in range(size.h) ]
         self.dirty = []
 
-    def get_dirty(self):
-        for cp in self.dirty:
-            yield cp
+    def __iter__(self):
+        yield from self.dirty
         self.dirty = []
         
     def update(self, cp):

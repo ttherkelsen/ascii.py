@@ -23,6 +23,7 @@ class Screen:
         
         self.cells = CellGrid(size=self.size)
         self.layout_required = True
+        self.rerender = False
 
     @property
     def size(self):
@@ -43,11 +44,15 @@ class Screen:
             self.layout_required = True # FIXME: Only the panel that contained the changed component needs re-layout
 
     def move(self, cname, pos):
-        print(self.names[cname].bbox)
-        self.names[cname].bbox += pos
-        print(self.names[cname].bbox)
-        self.layout_required = True
-        
+        # FIXME: Should this error if the found component is not a Panel (or subclass thereof)?
+        self.names[cname].move(pos)
+
+        # FIXME: This could be optimised so that instead of rendering the entire component hierarchy, instead
+        # we do:
+        # 1 - Move bbox from old position to new position in CellGrid
+        # 2 - Find out which panels overlap with the gap left between the old and new position
+        # 3 - render only the parts of components that fit in the gap
+        self.render(True)
             
     def layout(self):
         for panel in self.ui:
@@ -55,18 +60,18 @@ class Screen:
             panel.layout_done(self.surface.size.to_bbox())
         self.layout_required = False
         
-    def render(self):
+    def render(self, all=False):
         if self.layout_required:
             self.layout()
 
         # FIXME: It should be possible to move part of this to the layout phase?
         composite = set()
         for panel in self.ui[::-1]:
-            for cu in panel.render():
+            for cu in panel.render(all):
                 for cp in cu:
                     # Remove cells that overlap with previously rendered panels
                     if cp.to_tuple() not in composite:
                         self.cells.update(cp)
             composite |= panel._composite # Minor optimisation
-
-        self.surface.update(self.cells.get_dirty())
+            
+        self.surface.update(self.cells)

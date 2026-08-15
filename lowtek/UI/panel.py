@@ -29,4 +29,12 @@ class Panel(Container):
 
     def layout_done(self, bbox):
         super().layout_done(self.bbox)
+        self._update_composite()
+
+    def _update_composite(self):
         self._composite = self.bbox.to_composite()
+        
+    def move(self, pos):
+        self.bbox += pos # FIXME: Check for out of bounds?  Or should this be done in calling screen?
+        self._update_composite()
+        super().move(pos)

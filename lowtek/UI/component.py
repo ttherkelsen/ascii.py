@@ -39,7 +39,10 @@ class Component:
         
         setattr(self, name, value)
         return True
-        
+
+    def set_dirty(self, state=True):
+        self.cells.set_dirty(state)
+    
     def layout_hint(self, size):
         """
         Called from parent component (usually a Container) with the
@@ -86,14 +89,18 @@ class Component:
 
         if self.fill and "fill" in self.cells:
             del self.cells['fill']
-            
+
         return bbox
 
+    def move(self, pos):
+        self.cells.move(pos)
 
-    def render(self):
+    def render(self, all=False):
         if self.fill and "fill" not in self.cells:
             if composite := self.cells.fill(self._bbox):
                 self.cells['fill'] = cell.Composite(cells=self.fill, composite=composite)
-            
+
+        if all:
+            self.cells.set_dirty()
         yield from self.cells
 
