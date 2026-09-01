@@ -12,6 +12,8 @@ def mouseenter(screen, unused):
 
 def mouseleave(screen, unused):
     screen.update('cursor', 'hidden', True)
+    screen.update('x', "text", "??")
+    screen.update('y', "text", "??")
     screen.render(True)
 
 def mouseentercell(screen, pos):
@@ -46,7 +48,7 @@ def run(*args):
             UI.Panel(
                 name = 'cursor',
                 bbox = BBox(0, 0, 1, 1),
-                hidden = False,
+                hidden = True,
                 layout = UI.layout.Absolute(),
                 fill = Cell(" ", Colours("#ffff00ff", "#000000ff")),
             ),

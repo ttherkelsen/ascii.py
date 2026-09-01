@@ -2,6 +2,12 @@
 
 from enum import Enum, auto, IntFlag
 
+class Mouse(IntFlag):
+    NONE = 0
+    ENABLE = 1
+    SHOW = 2
+    FULL = 3
+
 class Align(Enum):
     LEFT = auto()
     CENTER = auto()

@@ -1,5 +1,6 @@
 from ..cell import CellGrid
 from ..classes import Position
+from ..const import Mouse
 
 import js
 
@@ -15,13 +16,14 @@ class Screen:
             self, /, *,
             surface,
             theme,
-            ui
+            ui,
+            mouse = Mouse.NONE,
     ):
         self.surface = surface
         self.theme = theme
         self.ui = ui
+        self.mouse = mouse
         self.names = self.get_names()
-        self.subscriptions = {}
 
         self.update_theme()
         self.update_layers(lazy=True)
@@ -29,27 +31,22 @@ class Screen:
         self.cells = CellGrid(size=self.size)
         self.layout_required = True
         self.prevcursor = None
+        self.prevcomponent = None
 
-        js.addEventListener('keydown', self.event_keydown)
-        js.addEventListener('keyup', self.event_keyup)
-        self.surface.canvas.addEventListener('mouseenter', self.event_mouseenter)
-        self.surface.canvas.addEventListener('mouseleave', self.event_mouseleave)
-        self.surface.canvas.addEventListener('mousemove', self.event_mousemove)
+        # FIXME: Make keyboard interaction work
+        #js.addEventListener('keydown', self.js_event_keydown)
+        #js.addEventListener('keyup', self.js_event_keyup)
+
+        if mouse & Mouse.ENABLE:
+            self.surface.canvas.addEventListener('mouseenter', self.js_event_mouseenter)
+            self.surface.canvas.addEventListener('mouseleave', self.js_event_mouseleave)
+            self.surface.canvas.addEventListener('mousemove', self.js_event_mousemove)
         
 
     @property
     def size(self):
         return self.surface.size
 
-    def subscribe(self, name, callback):
-         # FIXME: How to deal with multiple subs on same event?
-        self.subscriptions.setdefault(name, []).append(callback)
-
-    def check_subscriptions(self, name, event):
-        if name in self.subscriptions:
-            for cb in self.subscriptions[name]:
-                cb(self, event)
-        
     def get_names(self):
         names = {}
         for panel in self.ui:
@@ -72,39 +69,66 @@ class Screen:
         if self.names[cname].update(name, value, lazy):
             self.layout_required = True # FIXME: Only the panel that contained the changed component needs re-layout
 
-    def event_keydown(self, event):
-        self.check_subscriptions('keydown', event)
+    def js_event_keydown(self, event):
         event.stopPropagation();
         
-    def event_keyup(self, event):
-        self.check_subscriptions('keyup', event)
+    def js_event_keyup(self, event):
         event.stopPropagation();
 
-    def event_mouseenter(self, event):
-        self.check_subscriptions('mouseenter', None)
+    def js_event_mouseenter(self, event):
+        # Nothing to do here -- we don't register cell position here
         event.stopPropagation();
 
-    def event_mousemove(self, event):
+    def js_event_mousemove(self, event):
+        event.stopPropagation();
+        
         pos = Position(
             x = event.offsetX // self.surface.font.width,
             y = event.offsetY // self.surface.font.height,
         )
+
+        t = pos.to_tuple()
         if self.prevcursor != pos:
             if self.prevcursor is not None:
-                self.check_subscriptions('mouseleavecell', self.prevcursor)
+                if t in self.mouse_tracking:
+                    if (comp := self.mouse_tracking[t]) != self.prevcomponent:
+                        if self.prevcomponent is not None:
+                            self.event_component_mouseleave(self.prevcomponent)
+                        self.prevcomponent = comp
+                        self.event_component_enter(self.prevcomponent)
+                    self.event_component_mousemove(self.prevcomponent, pos)
+                elif self.prevcomponent is not None:
+                    self.event_component_mouseleave(self.prevcomponent)
+                    self.prevcomponent = None
+                self.event_cell_mouseleave(self.prevcursor)
+            self.event_cell_mouseenter(pos)
             self.prevcursor = pos
-            self.check_subscriptions('mouseentercell', pos)
             
+    def js_event_mouseleave(self, event):
         event.stopPropagation();
-
-    def event_mouseleave(self, event):
+        
         if self.prevcursor is not None:
-            self.check_subscriptions('mouseleavecell', self.prevcursor)
+            self.event_cell_mouseleave(self.prevcursor)
             self.prevcursor = None
+            if self.prevcomponent is not None:
+                self.event_component_mouseleave(self.prevcomponent)
+                self.prevcomponent = None
 
-        self.check_subscriptions('mouseleave', None)
-        event.stopPropagation();
-            
+    def event_cell_mouseenter(self, pos):
+        pass
+        
+    def event_cell_mouseleave(self, pos):
+        pass
+
+    def event_component_mouseenter(self, component):
+        pass
+
+    def event_component_mouseleave(self, component):
+        pass
+
+    def event_component_mousemove(self, component, pos):
+        pass
+    
     def shift_layer(self, cname, layer):
         # See FIXMEs in move()
         panel = self.names[cname]
@@ -127,9 +151,14 @@ class Screen:
         self.render(True)
             
     def layout(self):
-        for panel in self.ui:
+        if self.mouse & Mouse.ENABLE:
+            self.mouse_tracking = {}
+            
+        for panel in self.ui[::-1]:
             panel.layout_hint(self.surface.size)
             panel.layout_done(self.surface.size.to_bbox())
+            if self.mouse & Mouse.ENABLE:
+                self.mouse_tracking = panel.get_mouse_tracking() | self.mouse_tracking
         self.layout_required = False
         
     def render(self, all=False):

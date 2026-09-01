@@ -17,6 +17,7 @@ class Component:
             fill    = None,             # If specified, fill any cells not rendered by children with this cell
             theme   = None,             # Normally set during screen initialisation, but can be set manually
             name    = None,             # Name of the component, for easy access via Screen.update
+            tracked = None,             # Which cells are mouse tracked, see mouse_* methods below
     ):
         self.align = align
         self.valign = valign
@@ -104,3 +105,47 @@ class Component:
             self.cells.set_dirty()
         yield from self.cells
 
+    def mouse_enter(self):
+        """
+        Called when the mouse enters one of the cells tracked by
+        this component for the first time.
+
+        The tracked attribute can be set to either True or a composite
+        (set of (x, y) tuples).  If set to True, a composite will be generated as
+        part of the layout workflow based on the min (top left corner) and max
+        (bottom right corner) positions of rendered cells.
+        
+        While all components are tracked, if two (or more) components'
+        tracked cells overlap, this method will only be called on the
+        component in the top-most panel.
+        
+        This method should be overridden in a subclass; component
+        intentionally does not implement any logic for this method.
+        The same goes for all mouse_* methods.
+        """
+        ...
+
+    def mouse_leave(self):
+        """
+        Called when the mouse enters a cell that is not one of the
+        cells tracked by this component; or if the mouse leaves the
+        associated screen altogether.
+        """
+        ...
+
+    def mouse_move(self, pos):
+        """
+        Called with the component-relative position, when the
+        mouse moves over a cells tracked by this component.
+        """
+        ...
+
+    def mouse_button_down(self, pos):
+        ...
+
+    def mouse_button_up(self, pos):
+        ...
+
+    def mouse_button_click(self, pos):
+        ...
+        
