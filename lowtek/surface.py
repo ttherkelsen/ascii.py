@@ -5,7 +5,8 @@ from pyscript import web
 #FIXME: Destroy method?
 
 class Surface:
-    def __init__(self, js_id_or_div, font_name, size, init=None):
+    def __init__(self, js_id_or_div, font_name, size, init=None, zindex=0):
+        self.js_id_or_div = js_id_or_div
         if isinstance(js_id_or_div, str):
             self.div = web.page.find(f"#{js_id_or_div}")[0]
         else:
@@ -13,6 +14,7 @@ class Surface:
         self.font_name = font_name
         self.size = size
         self.font = Font.load(font_name)
+        self.zindex = zindex
 
         self.create_dom_elements()
         match init:
@@ -31,22 +33,27 @@ class Surface:
     def pixel_height(self):
         return self.size.h * self.font.height
 
+    def create_overlay(self):
+        return Surface(self.js_id_or_div, self.font_name, self.size, init="#00000000", zindex=self.zindex+1)
+
     def create_dom_elements(self):
         # Create div and canvas tag and add it to the self.parent_div element
-        canvas = web.canvas(
-            style = {
-                'width': f"{self.pixel_width}px",
-                'height': f"{self.pixel_height}px"
-            }
-        )
-        canvas._dom_element.width = self.pixel_width
-        canvas._dom_element.height = self.pixel_height
-        
         style = {
             'width': f"{self.pixel_width}px",
             'height': f"{self.pixel_height}px",
+            'z-index': f"{self.zindex}",
         }
+        if self.zindex > 0:
+            style['position'] = 'absolute'
+            style['left'] = '0px'
+            style['cursor'] = 'none'
             
+        canvas = web.canvas(style=style)
+        canvas._dom_element.width = self.pixel_width
+        canvas._dom_element.height = self.pixel_height
+
+        if self.zindex == 0:
+            self.div._dom_element.style = 'position: relative;'
         self.div.append(canvas)
         self.canvas = canvas
         

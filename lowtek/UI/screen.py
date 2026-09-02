@@ -1,6 +1,7 @@
-from ..cell import CellGrid
+from ..cell import CellGrid, Cell
 from ..classes import Position
 from ..const import Mouse
+from ..colours import Colours
 
 import js
 
@@ -38,9 +39,10 @@ class Screen:
         #js.addEventListener('keyup', self.js_event_keyup)
 
         if mouse & Mouse.ENABLE:
-            self.surface.canvas.addEventListener('mouseenter', self.js_event_mouseenter)
-            self.surface.canvas.addEventListener('mouseleave', self.js_event_mouseleave)
-            self.surface.canvas.addEventListener('mousemove', self.js_event_mousemove)
+            self.mouse_surface = self.surface.create_overlay()
+            self.mouse_surface.canvas.addEventListener('mouseenter', self.js_event_mouseenter)
+            self.mouse_surface.canvas.addEventListener('mouseleave', self.js_event_mouseleave)
+            self.mouse_surface.canvas.addEventListener('mousemove', self.js_event_mousemove)
         
 
     @property
@@ -110,12 +112,18 @@ class Screen:
                 self.prevcomponent = None
 
     def event_cell_mouseenter(self, pos):
-        #print("event_cell_mouseenter", pos)
-        pass
+        if self.mouse & Mouse.SHOW:
+            self.mouse_surface.write(
+                Cell(self.theme.mouse, self.theme.colours.mouse),
+                pos.x, pos.y
+            )
         
     def event_cell_mouseleave(self, pos):
-        #print("event_cell_mouseleave", pos)
-        pass
+        if self.mouse & Mouse.SHOW:
+            self.mouse_surface.write(
+                Cell(" ", Colours("#00000000", "#00000000")),
+                pos.x, pos.y
+            )
 
     def event_component_mouseenter(self, component):
         component.mouse_enter()

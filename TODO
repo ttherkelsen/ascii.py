@@ -1,4 +1,5 @@
 TODO:
+- mouse overlay surface
 - button component
 - user interaction framework (needed for windows, buttons, etc)
 - layout managers (Row, Column, etc)
