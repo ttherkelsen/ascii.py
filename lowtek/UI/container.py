@@ -19,14 +19,16 @@ class Container(Component):
         self.children = children if children is not None else []
         self.layout = layout or Row()
 
+    def set_name_cache(self, cache):
+        super().set_name_cache(cache)
+        for child in self.children:
+            child.set_name_cache(cache)
+        
     def update_theme(self, theme, lazy=False):
         self.theme = theme
             
         for child in self.children:
             child.update("theme", theme, lazy)
-
-    def get_names(self):
-        return { child.name: child for child in self.children + [ self ] if getattr(child, 'name', None) is not None }
             
     def layout_hint(self, size):
         psize = super().layout_hint(size)
@@ -48,3 +50,8 @@ class Container(Component):
             yield from child.render(all)
 
     
+    def get_mouse_tracking(self):
+        tracking = super().get_mouse_tracking()
+        for child in self.children:
+            tracking = child.get_mouse_tracking() | tracking
+        return tracking

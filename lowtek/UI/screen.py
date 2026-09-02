@@ -23,9 +23,9 @@ class Screen:
         self.theme = theme
         self.ui = ui
         self.mouse = mouse
-        self.names = self.get_names()
+        self.names = {}
 
-        self.update_theme()
+        self.update_ui()
         self.update_layers(lazy=True)
         
         self.cells = CellGrid(size=self.size)
@@ -47,15 +47,10 @@ class Screen:
     def size(self):
         return self.surface.size
 
-    def get_names(self):
-        names = {}
-        for panel in self.ui:
-            names |= panel.get_names()
-        return names
-        
-    def update_theme(self):
+    def update_ui(self):
         for panel in self.ui:
             panel.update("theme", self.theme, lazy=True)
+            panel.set_name_cache(self.names)
 
     def update_layers(self, lazy=False):
         layer = 0
@@ -95,7 +90,7 @@ class Screen:
                         if self.prevcomponent is not None:
                             self.event_component_mouseleave(self.prevcomponent)
                         self.prevcomponent = comp
-                        self.event_component_enter(self.prevcomponent)
+                        self.event_component_mouseenter(self.prevcomponent)
                     self.event_component_mousemove(self.prevcomponent, pos)
                 elif self.prevcomponent is not None:
                     self.event_component_mouseleave(self.prevcomponent)
@@ -115,19 +110,21 @@ class Screen:
                 self.prevcomponent = None
 
     def event_cell_mouseenter(self, pos):
+        #print("event_cell_mouseenter", pos)
         pass
         
     def event_cell_mouseleave(self, pos):
+        #print("event_cell_mouseleave", pos)
         pass
 
     def event_component_mouseenter(self, component):
-        pass
+        component.mouse_enter()
 
     def event_component_mouseleave(self, component):
-        pass
+        component.mouse_exit()
 
     def event_component_mousemove(self, component, pos):
-        pass
+        component.mouse_over(pos)
     
     def shift_layer(self, cname, layer):
         # See FIXMEs in move()

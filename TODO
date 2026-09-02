@@ -2,6 +2,7 @@ TODO:
 - button component
 - user interaction framework (needed for windows, buttons, etc)
 - layout managers (Row, Column, etc)
+- decide whether to use DOM event names in UI or use own names
 - refactor cell.py and classes.py into cell/* and classes/*?
 - Do pythonic type hints
 - rewrite GlyphPage to be less of a hack
@@ -10,6 +11,8 @@ TODO:
 - test of fonts with depth > 1 (multicolour)
 
 DONE:
+- make a decision on whether obj.a = 1 (which then uses property for control) or obj.set_a(1) should be used
+  Answer: We always use set_a().
 - mouse tracking
 - basic event subscription for key presses (keydown/keyup)
 - moving panels around (done by adjusting cellupdate.pos)

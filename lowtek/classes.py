@@ -11,6 +11,16 @@ class Core:
     def clone(self):
         return copy.copy(self)
 
+class Callback(Core):
+    def __init__(self, name, func, *args, **kwargs):
+        self.name = name
+        self.func = func
+        self.args = args
+        self.kwargs = kwargs
+
+    def run(self):
+        return self.func(*self.args, **kwargs)
+    
 class Frame(Core):
     def __init__(
             self,
@@ -290,6 +300,9 @@ class Position(Core):
 
     def to_pixels(self, pixelsize):
         return PixelPosition(self.x * pixelsize.w, self.y * pixelsize.h)
+
+    def to_tuple(self):
+        return (self.x, self.y)
     
 
 PixelPosition = Position
