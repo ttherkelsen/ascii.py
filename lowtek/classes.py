@@ -18,8 +18,8 @@ class Callback(Core):
         self.args = args
         self.kwargs = kwargs
 
-    def run(self):
-        return self.func(*self.args, **kwargs)
+    def run(self, *args, **kwargs):
+        return self.func(*(args + self.args), **(self.kwargs | kwargs))
     
 class Frame(Core):
     def __init__(

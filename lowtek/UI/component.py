@@ -31,7 +31,7 @@ class Component:
         self.theme = theme
         self.name = name
         self.tracked = tracked
-        self.callbacks = callbacks if callbacks is not None else {}
+        self.callbacks = { t.name: t for t in callbacks } if callbacks is not None else {}
         
         self.cells = cell.CellUpdates()
 
@@ -156,7 +156,7 @@ class Component:
         component in the top-most panel.
         """
         if 'mouse_enter' in self.callbacks:
-            return self.callbacks['mouse_enter'](self)
+            return self.callbacks['mouse_enter'].run(self)
 
     def mouse_exit(self):
         """
@@ -165,7 +165,7 @@ class Component:
         associated screen altogether.
         """
         if 'mouse_exit' in self.callbacks:
-            return self.callbacks['mouse_exit'](self)
+            return self.callbacks['mouse_exit'].run(self)
 
     def mouse_over(self, pos):
         """
@@ -173,7 +173,7 @@ class Component:
         mouse moves over a cells tracked by this component.
         """
         if 'mouse_over' in self.callbacks:
-            return self.callbacks['mouse_over'](self, pos)
+            return self.callbacks['mouse_over'].run(self, pos)
 
     def mouse_button_down(self, pos):
         ...
