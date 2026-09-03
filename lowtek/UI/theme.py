@@ -16,6 +16,7 @@ class LightTheme(Theme):
             background = Colours("#a0a0a0ff", "#333333ff"),
             panel_background = Colours("#c0c0c0ff", "#333333ff"),
             mouse = Colours("#c0c0ff80", "#33333380"),
+            shadow = Colours("#c0c0c0ff", "#333333ff"),
         )
         self.margin = " "
         self.padding = " "

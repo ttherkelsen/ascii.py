@@ -88,32 +88,45 @@ class Screen:
             y = event.offsetY // self.surface.font.height,
         )
 
+        if self.prevcursor == pos:
+            return
+
+        render = False
         t = pos.to_tuple()
-        if self.prevcursor != pos:
-            if self.prevcursor is not None:
-                if t in self.mouse_tracking:
-                    if (comp := self.mouse_tracking[t]) != self.prevcomponent:
-                        if self.prevcomponent is not None:
-                            self.event_component_mouseleave(self.prevcomponent)
-                        self.prevcomponent = comp
-                        self.event_component_mouseenter(self.prevcomponent)
-                    self.event_component_mousemove(self.prevcomponent, pos)
-                elif self.prevcomponent is not None:
-                    self.event_component_mouseleave(self.prevcomponent)
-                    self.prevcomponent = None
-                self.event_cell_mouseleave(self.prevcursor)
-            self.event_cell_mouseenter(pos)
-            self.prevcursor = pos
+
+        if self.prevcursor is not None: # FIXME: What happens if a tracked area is on the surface edge?
+            if t in self.mouse_tracking:
+                if (comp := self.mouse_tracking[t]) != self.prevcomponent:
+                    if self.prevcomponent is not None:
+                        render |= self.event_component_mouseleave(self.prevcomponent)
+                    self.prevcomponent = comp
+                    render |= self.event_component_mouseenter(self.prevcomponent)
+                render |= self.event_component_mousemove(self.prevcomponent, pos)
+            elif self.prevcomponent is not None:
+                render |= self.event_component_mouseleave(self.prevcomponent)
+                self.prevcomponent = None
+            render |= self.event_cell_mouseleave(self.prevcursor)
+        render |= self.event_cell_mouseenter(pos)
+        self.prevcursor = pos
+
+        if render:
+            self.render()
             
     def js_event_mouseleave(self, event):
         event.stopPropagation();
-        
-        if self.prevcursor is not None:
-            self.event_cell_mouseleave(self.prevcursor, True)
-            self.prevcursor = None
-            if self.prevcomponent is not None:
-                self.event_component_mouseleave(self.prevcomponent)
-                self.prevcomponent = None
+
+        if self.prevcursor is None:
+            return
+
+        render = False
+        render |= self.event_cell_mouseleave(self.prevcursor, True)
+        self.prevcursor = None
+        if self.prevcomponent is not None:
+            render |= self.event_component_mouseleave(self.prevcomponent)
+            self.prevcomponent = None
+
+        if render:
+            self.render()
 
     def draw_cursor(self, pos):
         if self.mouse & Mouse.CURSOR:
@@ -137,6 +150,7 @@ class Screen:
         self.cursor_pos = pos
         if self.mouse & Mouse.SHOW:
             self.draw_cursor(pos)
+        return False
         
     def event_cell_mouseleave(self, pos, left_canvas=False):
         if left_canvas:
@@ -144,15 +158,16 @@ class Screen:
             
         if self.mouse & Mouse.SHOW:
             self.undraw_cursor(pos)
+        return False
 
     def event_component_mouseenter(self, component):
-        component.mouse_enter()
+        return component.mouse_enter()
 
     def event_component_mouseleave(self, component):
-        component.mouse_exit()
+        return component.mouse_exit()
 
     def event_component_mousemove(self, component, pos):
-        component.mouse_over(pos)
+        return component.mouse_over(pos)
     
     def shift_layer(self, cname, layer):
         # See FIXMEs in move()
@@ -184,6 +199,7 @@ class Screen:
             panel.layout_done(self.surface.size.to_bbox())
             if self.mouse & Mouse.ENABLE:
                 self.mouse_tracking = panel.get_mouse_tracking() | self.mouse_tracking
+
         self.layout_required = False
         
     def render(self, all=False):

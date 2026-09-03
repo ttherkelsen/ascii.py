@@ -3,6 +3,7 @@
 # D nw se   - Box drawing glyphs (Diagonal)
 # C num     - Braile (for counting)
 # P num     - Progress bars
+# DS s|e    - Drop Shadows
 #
 # For box drawing, each compass direction is a single character
 # which determines the type of line going in that direction
@@ -165,4 +166,8 @@ GLYPHS = {
     'B  r ': 0x2577,
 
     # FIXME: Duplications for the corners of dashed lines similar to rounded LD
+
+    # Drop shadows
+    'DSs': 0x2580,
+    'DSe': 0x2584,
 }

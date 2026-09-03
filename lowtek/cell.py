@@ -116,6 +116,18 @@ class Frame(BBox):
                 for x in range(d.offset.w):
                     yield CellPosition(d.cell, Position(self.bbox.x + d.offset.x + x, self.bbox.y + d.offset.y + y) + self.pos)
 
+class DropShadow(CellUpdate):
+    def __init__(self, size, colours, pos=None):
+        super().__init__(cells=None, pos=pos)
+        self.size = size
+        self.dss = Cell(GLYPHS['DSs'], colours)
+        self.dse = Cell(GLYPHS['DSe'], colours)
+
+    def iter(self):
+        for x in range(self.size.w):
+            yield CellPosition(self.dss, Position(x + 1, self.size.h) + self.pos)
+        yield CellPosition(self.dse, Position(self.size.w, self.size.h - 1) + self.pos)
+                    
 class CrossLD(CellUpdate):
     def __init__(self, size, colours, center=None, pos=None):
         super().__init__(cells=None, pos=pos)

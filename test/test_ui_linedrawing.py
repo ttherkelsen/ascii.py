@@ -11,8 +11,8 @@ def run(*args):
     theme = UI.LightTheme()
 
     #surface = Surface('canvas', 'unscii_full_8x16', size)
-    surface = Surface('canvas', 'unifont_all_8x16w', size)
-    #surface = Surface('canvas', 'ucs_9x15', size)
+    #surface = Surface('canvas', 'unifont_all_8x16w', size)
+    surface = Surface('canvas', 'ucs_9x15', size)
 
     screen = UI.Screen(
         theme = theme,

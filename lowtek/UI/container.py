@@ -53,5 +53,5 @@ class Container(Component):
     def get_mouse_tracking(self):
         tracking = super().get_mouse_tracking()
         for child in self.children:
-            tracking = child.get_mouse_tracking() | tracking
+            tracking |= child.get_mouse_tracking() # Children mouse tracking override container tracking
         return tracking

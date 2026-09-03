@@ -103,8 +103,7 @@ class Component:
         if self.fill and "fill" in self.cells:
             del self.cells['fill']
 
-        if self.tracked:
-            self._mouse_tracking = None
+        self._mouse_tracking = None
             
         return bbox
 
@@ -157,6 +156,7 @@ class Component:
         """
         if 'mouse_enter' in self.callbacks:
             return self.callbacks['mouse_enter'].run(self)
+        return False
 
     def mouse_exit(self):
         """
@@ -166,6 +166,7 @@ class Component:
         """
         if 'mouse_exit' in self.callbacks:
             return self.callbacks['mouse_exit'].run(self)
+        return False
 
     def mouse_over(self, pos):
         """
@@ -174,6 +175,7 @@ class Component:
         """
         if 'mouse_over' in self.callbacks:
             return self.callbacks['mouse_over'].run(self, pos)
+        return False
 
     def mouse_button_down(self, pos):
         ...
