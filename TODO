@@ -1,6 +1,5 @@
 TODO:
-- mouse overlay surface
-- button component
+- button component (to test mouse click)
 - user interaction framework (needed for windows, buttons, etc)
 - layout managers (Row, Column, etc)
 - decide whether to use DOM event names in UI or use own names
@@ -10,9 +9,10 @@ TODO:
 - support for gz compression of fonts?
 - bdf2lgf conversion tool
 - test of fonts with depth > 1 (multicolour)
-- FFS, pyscript in "maintenance mode" now.  Guess I'm switching to Pyodide?
+- switch to Pyodide (Pyscript is in "maintenance mode" now)
 
 DONE:
+- mouse overlay surface
 - make a decision on whether obj.a = 1 (which then uses property for control) or obj.set_a(1) should be used
   Answer: We always use set_a().
 - mouse tracking
