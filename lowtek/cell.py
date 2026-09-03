@@ -8,6 +8,9 @@ class Cell:
         self.glyph = glyph if isinstance(glyph, int) else ord(glyph)
         self.colours = colours
 
+    def inverse(self):
+        return Cell(self.glyph, self.colours.inverse())
+
 def str2cells(text, colours):
     return [ Cell(t, colours) for t in text ]
 
@@ -198,6 +201,13 @@ class CellGrid:
         yield from self.dirty
         self.dirty = []
         
+    def __getitem__(self, pos):
+        if isinstance(pos, Position):
+            return self.grid[pos.y][pos.x]
+        return NotImplemented
+
     def update(self, cp):
         self.grid[cp.pos.y][cp.pos.x] = cp.cell
         self.dirty.append(cp)
+
+    

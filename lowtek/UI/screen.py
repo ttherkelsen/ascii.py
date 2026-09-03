@@ -31,18 +31,22 @@ class Screen:
         
         self.cells = CellGrid(size=self.size)
         self.layout_required = True
-        self.prevcursor = None
-        self.prevcomponent = None
 
         # FIXME: Make keyboard interaction work
         #js.addEventListener('keydown', self.js_event_keydown)
         #js.addEventListener('keyup', self.js_event_keyup)
 
         if mouse & Mouse.ENABLE:
-            self.mouse_surface = self.surface.create_overlay()
-            self.mouse_surface.canvas.addEventListener('mouseenter', self.js_event_mouseenter)
-            self.mouse_surface.canvas.addEventListener('mouseleave', self.js_event_mouseleave)
-            self.mouse_surface.canvas.addEventListener('mousemove', self.js_event_mousemove)
+            self.prevcursor = None
+            self.prevcomponent = None
+            self.cursor_pos = None
+            self.surface.create_cursor()
+            
+            if mouse & Mouse.HIDE:
+                self.surface.hide_os_cursor(True)
+            self.surface.canvas.addEventListener('mouseenter', self.js_event_mouseenter)
+            self.surface.canvas.addEventListener('mouseleave', self.js_event_mouseleave)
+            self.surface.canvas.addEventListener('mousemove', self.js_event_mousemove)
         
 
     @property
@@ -105,25 +109,41 @@ class Screen:
         event.stopPropagation();
         
         if self.prevcursor is not None:
-            self.event_cell_mouseleave(self.prevcursor)
+            self.event_cell_mouseleave(self.prevcursor, True)
             self.prevcursor = None
             if self.prevcomponent is not None:
                 self.event_component_mouseleave(self.prevcomponent)
                 self.prevcomponent = None
 
-    def event_cell_mouseenter(self, pos):
-        if self.mouse & Mouse.SHOW:
-            self.mouse_surface.write(
+    def draw_cursor(self, pos):
+        if self.mouse & Mouse.CURSOR:
+            self.surface.write(
                 Cell(self.theme.mouse, self.theme.colours.mouse),
+                pos.x, pos.y, cursor=True
+            )
+        else: # self.mouse & Mouse.INVERSE:
+            self.surface.write(
+                self.cells[pos].inverse(),
                 pos.x, pos.y
             )
+
+    def undraw_cursor(self, pos):
+        self.surface.write(
+            self.cells[pos],
+            pos.x, pos.y
+        )
         
-    def event_cell_mouseleave(self, pos):
+    def event_cell_mouseenter(self, pos):
+        self.cursor_pos = pos
         if self.mouse & Mouse.SHOW:
-            self.mouse_surface.write(
-                Cell(" ", Colours("#00000000", "#00000000")),
-                pos.x, pos.y
-            )
+            self.draw_cursor(pos)
+        
+    def event_cell_mouseleave(self, pos, left_canvas=False):
+        if left_canvas:
+            self.cursor_pos = None
+            
+        if self.mouse & Mouse.SHOW:
+            self.undraw_cursor(pos)
 
     def event_component_mouseenter(self, component):
         component.mouse_enter()
@@ -183,3 +203,10 @@ class Screen:
             composite |= panel._composite # Minor optimisation
             
         self.surface.update(self.cells)
+
+        # Since we don't know if the cursor position got overwritten or not,
+        # play it safe and redraw cursor.  It's probably faster to do it this
+        # way than checking if the cursor position is in the list of dirty cells
+        if (self.mouse & Mouse.SHOW) and self.cursor_pos:
+            self.undraw_cursor(self.cursor_pos)
+            self.draw_cursor(self.cursor_pos)

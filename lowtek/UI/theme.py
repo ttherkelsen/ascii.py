@@ -15,7 +15,7 @@ class LightTheme(Theme):
             button_hover = Colours("#30c0c0ff", "#000000ff"),
             background = Colours("#a0a0a0ff", "#333333ff"),
             panel_background = Colours("#c0c0c0ff", "#333333ff"),
-            mouse = Colours("#c0c0ffc0", "#33333380"),
+            mouse = Colours("#c0c0ff80", "#33333380"),
         )
         self.margin = " "
         self.padding = " "

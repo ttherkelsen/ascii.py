@@ -5,8 +5,13 @@ from enum import Enum, auto, IntFlag
 class Mouse(IntFlag):
     NONE = 0
     ENABLE = 1
-    SHOW = 2
-    FULL = 3
+    CURSOR = 2
+    INVERSE = 4
+    HIDE = 8
+
+    SHOW = 6
+    FULL = 11
+    FULLINVERSE = 13
 
 class Align(Enum):
     LEFT = auto()

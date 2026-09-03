@@ -10,6 +10,11 @@ class Colours:
 
     def __getitem__(self, i):
         return self.colours[i]
+
+    def inverse(self):
+        c = Colours()
+        c.colours = self.colours[::-1]
+        return c
     
     @staticmethod
     def to_memoryview(colour):

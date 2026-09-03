@@ -1,12 +1,13 @@
 from .font import Font
 
 from pyscript import web
+import js
+import pyodide
 
 #FIXME: Destroy method?
 
 class Surface:
-    def __init__(self, js_id_or_div, font_name, size, init=None, zindex=0):
-        self.js_id_or_div = js_id_or_div
+    def __init__(self, js_id_or_div, font_name, size, init=None):
         if isinstance(js_id_or_div, str):
             self.div = web.page.find(f"#{js_id_or_div}")[0]
         else:
@@ -14,7 +15,6 @@ class Surface:
         self.font_name = font_name
         self.size = size
         self.font = Font.load(font_name)
-        self.zindex = zindex
 
         self.create_dom_elements()
         match init:
@@ -33,32 +33,30 @@ class Surface:
     def pixel_height(self):
         return self.size.h * self.font.height
 
-    def create_overlay(self):
-        return Surface(self.js_id_or_div, self.font_name, self.size, init="#00000000", zindex=self.zindex+1)
+    def hide_os_cursor(self, state=True):
+        self.canvas._dom_element.style.cursor = 'none' if state else 'auto'
 
     def create_dom_elements(self):
         # Create div and canvas tag and add it to the self.parent_div element
         style = {
             'width': f"{self.pixel_width}px",
             'height': f"{self.pixel_height}px",
-            'z-index': f"{self.zindex}",
         }
-        if self.zindex > 0:
-            style['position'] = 'absolute'
-            style['left'] = '0px'
-            style['cursor'] = 'none'
             
         canvas = web.canvas(style=style)
         canvas._dom_element.width = self.pixel_width
         canvas._dom_element.height = self.pixel_height
 
-        if self.zindex == 0:
-            self.div._dom_element.style = 'position: relative;'
         self.div.append(canvas)
         self.canvas = canvas
         
         # Keep local proxy of canvas 2d context
         self.ctx = canvas._dom_element.getContext("2d")
+
+    def create_cursor(self):
+        # Create offscreen canvas for cursor overlay
+        self.offscreencanvas = js.OffscreenCanvas.new(self.font.width, self.font.height)
+        self.octx = self.offscreencanvas.getContext("2d")
 
     def colour_fill(self, colour):
         self.ctx.fillStyle = colour;
@@ -70,9 +68,14 @@ class Surface:
             for x in range(self.size.w):
                 self.ctx.putImageData(glyph, x*self.font.width, y*self.font.height)
 
-    def write(self, cell, x, y):
+    def write(self, cell, x, y, cursor=False):
         glyph = self.font.render_glyph(cell)
-        self.ctx.putImageData(glyph, x*self.font.width, y*self.font.height)
+
+        if cursor:
+            self.octx.putImageData(glyph, 0, 0)
+            self.ctx.drawImage(self.offscreencanvas, x*self.font.width, y*self.font.height)
+        else:
+            self.ctx.putImageData(glyph, x*self.font.width, y*self.font.height)
     
     def update(self, cu):
         for cp in cu:
