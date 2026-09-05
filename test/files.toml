@@ -2,8 +2,10 @@
 experimental_create_proxy = "auto"
 
 [files]
-"{LIB}" = "http://localhost/lowtek"
-"{RES}" = "http://localhost/resource"
+#"{LIB}" = "http://localhost/lowtek"
+"{LIB}" = "/lowtek"
+#"{RES}" = "http://localhost/resource"
+"{RES}" = "/resource"
 "{LIB}/__init__.py" = "./lowtek/"
 #"{LIB}/test.py" = "./lowtek/"
 "{LIB}/font.py" = "./lowtek/"
