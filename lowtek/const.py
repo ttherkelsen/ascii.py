@@ -1,6 +1,6 @@
 # Various constants
 
-from enum import Enum, auto, IntFlag
+from enum import Enum, auto, IntFlag, IntEnum
 
 class Mouse(IntFlag):
     NONE = 0
@@ -8,11 +8,25 @@ class Mouse(IntFlag):
     CURSOR = 2
     INVERSE = 4
     HIDE = 8
+    NOCONTEXT = 16
 
     SHOW = 6
     FULL = 11
     FULLINVERSE = 13
 
+class MouseButton(IntEnum):
+    LEFT = 0
+    MIDDLE = 1
+    RIGHT = 2
+    BACK = 3
+    FORWARD = 4
+
+class State(IntFlag):
+    UP = auto()
+    DOWN = auto()
+    HOVER = auto()
+    DISABLED = auto()
+    
 class Align(Enum):
     LEFT = auto()
     CENTER = auto()

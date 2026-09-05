@@ -1,7 +1,11 @@
 TODO:
 - button component (to test mouse click)
+- how to capture mouse scroll wheel events?
+- how to implement resizing and drag'n'drop mouse actions? (uses press and hold button logic)
+- more thorough testing of what happens when a component is larger than allowed
 - user interaction framework (needed for windows, buttons, etc)
 - layout managers (Row, Column, etc)
+- more components (duh :P)
 - decide whether to use DOM event names in UI or use own names
 - refactor cell.py and classes.py into cell/* and classes/*?
 - Do pythonic type hints
@@ -10,9 +14,10 @@ TODO:
 - bdf2lgf conversion tool
 - test of fonts with depth > 1 (multicolour)
 - switch to Pyodide (Pyscript is in "maintenance mode" now)
+- pixelated replacement cursors?
 
 DONE:
-- mouse overlay surface
+- mouse overlay surface [Idea tried out and skipped because it added more HTML complexity]
 - make a decision on whether obj.a = 1 (which then uses property for control) or obj.set_a(1) should be used
   Answer: We always use set_a().
 - mouse tracking

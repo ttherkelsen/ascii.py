@@ -1,6 +1,6 @@
 from ..cell import CellGrid, Cell
 from ..classes import Position
-from ..const import Mouse
+from ..const import Mouse, MouseButton
 from ..colours import Colours
 
 import js
@@ -40,13 +40,21 @@ class Screen:
             self.prevcursor = None
             self.prevcomponent = None
             self.cursor_pos = None
+            self.reset_mousedown_pos()
             self.surface.create_cursor()
             
             if mouse & Mouse.HIDE:
                 self.surface.hide_os_cursor(True)
+            if mouse & Mouse.NOCONTEXT:
+                self.surface.canvas.addEventListener('contextmenu', self.js_event_contextmenu)
+                
             self.surface.canvas.addEventListener('mouseenter', self.js_event_mouseenter)
             self.surface.canvas.addEventListener('mouseleave', self.js_event_mouseleave)
             self.surface.canvas.addEventListener('mousemove', self.js_event_mousemove)
+                
+            self.surface.canvas.addEventListener('mousedown', self.js_event_mousedown)
+            self.surface.canvas.addEventListener('mouseup', self.js_event_mouseup)
+            
         
 
     @property
@@ -70,11 +78,17 @@ class Screen:
         if self.names[cname].update(name, value, lazy):
             self.layout_required = True # FIXME: Only the panel that contained the changed component needs re-layout
 
+    def reset_mousedown_pos(self):
+        self.mousedown_pos = [ None ]*len(MouseButton)
+
     def js_event_keydown(self, event):
         event.stopPropagation();
         
     def js_event_keyup(self, event):
         event.stopPropagation();
+
+    def js_event_contextmenu(self, event):
+        event.preventDefault();
 
     def js_event_mouseenter(self, event):
         # Nothing to do here -- we don't register cell position here
@@ -125,9 +139,31 @@ class Screen:
             render |= self.event_component_mouseleave(self.prevcomponent)
             self.prevcomponent = None
 
+        self.reset_mousedown_pos()
+            
         if render:
             self.render()
 
+    def js_event_mousedown(self, event):  #FIXME: Do we care about down/up events outside components?
+        event.stopPropagation();
+
+        render = False
+        if self.prevcomponent:
+            render |= self.event_component_mousedown(self.prevcomponent, event.button)
+        render |= self.event_cell_mousedown(self.prevcursor, event.button)
+
+        if render:
+            self.render()
+        
+    def js_event_mouseup(self, event):
+        event.stopPropagation();
+        render = False
+        render |= self.event_component_mouseup(self.prevcomponent, event.button)
+        render |= self.event_cell_mouseup(self.prevcursor, event.button)
+
+        if render:
+            self.render()
+        
     def draw_cursor(self, pos):
         if self.mouse & Mouse.CURSOR:
             self.surface.write(
@@ -160,6 +196,13 @@ class Screen:
             self.undraw_cursor(pos)
         return False
 
+    def event_cell_mousedown(self, pos, button):
+        return False
+
+    def event_cell_mouseup(self, pos, button):
+        self.mousedown_pos[button] = None
+        return False
+    
     def event_component_mouseenter(self, component):
         return component.mouse_enter()
 
@@ -168,6 +211,22 @@ class Screen:
 
     def event_component_mousemove(self, component, pos):
         return component.mouse_over(pos)
+
+    def event_component_mousedown(self, component, button):
+        self.mousedown_pos[button] = component
+        return component.mouse_button_down(button, self.cursor_pos)
+
+    def event_component_mouseup(self, component, button):
+        render = False
+        if component:
+            render |= component.mouse_button_up(button, self.cursor_pos)
+        if self.mousedown_pos[button]:
+            if self.mousedown_pos[button] == component:
+                render |= component.mouse_button_click(button, self.cursor_pos)
+            else:
+                render |= self.mousedown_pos[button].mouse_button_up(button, self.cursor_pos)
+        
+        return render
     
     def shift_layer(self, cname, layer):
         # See FIXMEs in move()

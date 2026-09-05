@@ -170,19 +170,40 @@ class Component:
 
     def mouse_over(self, pos):
         """
-        Called with the component-relative position, when the
-        mouse moves over a cells tracked by this component.
+        Called with the screen position, when the mouse moves over
+        a cells tracked by this component.
         """
         if 'mouse_over' in self.callbacks:
             return self.callbacks['mouse_over'].run(self, pos)
         return False
 
-    def mouse_button_down(self, pos):
-        ...
+    def mouse_button_down(self, button, pos):
+        """
+        Called with the button pressed and the screen position,
+        when a mouse button is pressed while the mouse is over this
+        component.
+        """
+        if 'mouse_button_down' in self.callbacks:
+            return self.callbacks['mouse_button_down'].run(self, button, pos)
+        return False
 
-    def mouse_button_up(self, pos):
-        ...
+    def mouse_button_up(self, button, pos):
+        """
+        Called with the button released and the screen position, when
+        a mouse button is released while the mouse is over this
+        component.
+        """
+        if 'mouse_button_up' in self.callbacks:
+            return self.callbacks['mouse_button_up'].run(self, button, pos)
+        return False
 
-    def mouse_button_click(self, pos):
-        ...
+    def mouse_button_click(self, button, pos):
+        """
+        Called with the button clicked and the screen position, when a
+        mouse button is pressed and released while the mouse is over
+        this component.
+        """
+        if 'mouse_button_click' in self.callbacks:
+            return self.callbacks['mouse_button_click'].run(self, button, pos)
+        return False
         

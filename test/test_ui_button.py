@@ -3,9 +3,13 @@ from lowtek import UI
 from lowtek.classes import BBox, Size, Position, Callback
 from lowtek.cell import Cell
 from lowtek.colours import Colours
-from lowtek.const import Mouse
+from lowtek.const import Mouse, State
 
 import js
+
+def button_click(component):
+    print("BUTTON CLICKED")
+    return False
 
 def run(*args):
     global screen
@@ -28,11 +32,16 @@ def run(*args):
                 fill = Cell(theme.panel_background, theme.colours.text),
                 tracked = True,
                 children=[
-                    UI.Button(text="Click Me", bbox=BBox(0, 0, 18, 4), border="s"),
+                    UI.Button(
+                        text="Click Me", bbox=BBox(0, 0, 15, 4),
+                        callbacks=[
+                            Callback('button_click', button_click),
+                        ],
+                    ),
                 ],
             ),
         ],
-        mouse = Mouse.FULL,
+        mouse = Mouse.ENABLE | Mouse.NOCONTEXT,
     )
     
     screen.render()

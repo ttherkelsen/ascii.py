@@ -13,6 +13,7 @@ class LightTheme(Theme):
             border = Colours("#c0c0c0ff", "#333333ff"),
             button = Colours("#30c030ff", "#000000ff"),
             button_hover = Colours("#30c0c0ff", "#000000ff"),
+            button_disabled = Colours("#a0a0a0ff", "#000000ff"),
             background = Colours("#a0a0a0ff", "#333333ff"),
             panel_background = Colours("#c0c0c0ff", "#333333ff"),
             mouse = Colours("#c0c0ff80", "#33333380"),
