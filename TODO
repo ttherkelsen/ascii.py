@@ -1,12 +1,10 @@
 TODO:
-- button component (to test mouse click)
+- Window component
 - how to capture mouse scroll wheel events?
 - how to implement resizing and drag'n'drop mouse actions? (uses press and hold button logic)
 - more thorough testing of what happens when a component is larger than allowed
-- user interaction framework (needed for windows, buttons, etc)
 - layout managers (Row, Column, etc)
 - more components (duh :P)
-- decide whether to use DOM event names in UI or use own names
 - refactor cell.py and classes.py into cell/* and classes/*?
 - Do pythonic type hints
 - rewrite GlyphPage to be less of a hack
@@ -17,6 +15,10 @@ TODO:
 - pixelated replacement cursors?
 
 DONE:
+- decide whether to use DOM event names in UI or use own names
+  Answer: Invent own names (probably gonna regret this decision eventually)
+- user interaction framework (needed for windows, buttons, etc)
+- button component (to test mouse click)
 - mouse overlay surface [Idea tried out and skipped because it added more HTML complexity]
 - make a decision on whether obj.a = 1 (which then uses property for control) or obj.set_a(1) should be used
   Answer: We always use set_a().
