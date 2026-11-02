@@ -1,4 +1,5 @@
 TODO:
+- Make card game app
 - Window component
 - how to capture mouse scroll wheel events?
 - how to implement resizing and drag'n'drop mouse actions? (uses press and hold button logic)
