@@ -1,6 +1,7 @@
 import abc
 
-from .classes import Position
+from .classes import Position, Size
+from .colours import Colours
 from .glyphs import GLYPHS
 
 class Cell:
@@ -85,6 +86,37 @@ class BBoxFill(BBox):
         for yy in range(self.bbox.h):
             for xx in range(self.bbox.w):
                 yield CellPosition(self.cells, Position(self.bbox.x + xx, self.bbox.y + yy) + self.pos)
+
+class Image(BBox):
+    def __init__(self, imagedata, palette, colours, **bbox):
+        self.imagedata = imagedata
+        self.palette = palette
+        self.colours = colours
+        super().__init__(
+            cells=self.render_cells(),
+            bbox=Size(len(self.imagedata[0]), len(self.imagedata)).to_bbox(0, 0),
+            **bbox,
+        )
+
+    def render_cells(self):
+        cells = []
+        for row in self.imagedata:
+            for col in row:
+                c = self.palette.get(col, col)
+                match c:
+                    case str():
+                        cell = Cell(ord(c), self.colours)
+                    case int():
+                        cell = Cell(c, self.colours)
+                    case tuple():
+                        c, *colours = c
+                        cell = Cell(c, self.colours.update(*colours))
+                    case Cell():
+                        cell = c
+                    case _:
+                        raise ValueError(f"Unknown palette type {c=}")
+                cells.append(cell)
+        return cells
         
 class Row(CellUpdate):
     def iter(self):

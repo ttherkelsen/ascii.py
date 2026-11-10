@@ -2,8 +2,11 @@
 # Colours object is always a singleton
 
 class Colours:
-    def __init__(self, *colours):
-        self.colours = tuple([ Colours.to_memoryview(t) for t in colours ])
+    def __init__(self, *colours, raw=False):
+        if raw:
+            self.colours = tuple(colours)
+        else:
+            self.colours = tuple([ Colours.to_memoryview(t) for t in colours ])
 
     def __hash__(self):
         return hash(self.colours)
@@ -15,6 +18,14 @@ class Colours:
         c = Colours()
         c.colours = self.colours[::-1]
         return c
+
+    def update(self, *colours):
+        c = list(self.colours)
+        for idx, cc in enumerate(colours):
+            if cc is not None:
+                c[idx] = Colours.to_memoryview(cc)
+        return Colours(*c, raw=True)
+        
     
     @staticmethod
     def to_memoryview(colour):

@@ -170,4 +170,11 @@ GLYPHS = {
     # Drop shadows
     'DSs': 0x2580,
     'DSe': 0x2584,
+
+    # "Greyscale"
+    'GS0': 0x20,
+    'GS1': 0x2591,
+    'GS2': 0x2592,
+    'GS3': 0x2593,
+    'GS4': 0x2588,
 }
