@@ -14,6 +14,9 @@ class Colours:
     def __getitem__(self, i):
         return self.colours[i]
 
+    def to_hex(self, i):
+        return f"#{self[i][0]:02x}{self[i][1]:02x}{self[i][2]:02x}{self[i][3]:02x}"
+
     def inverse(self):
         c = Colours()
         c.colours = self.colours[::-1]

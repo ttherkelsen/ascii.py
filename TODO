@@ -14,6 +14,9 @@ TODO:
 - test of fonts with depth > 1 (multicolour)
 - switch to Pyodide (Pyscript is in "maintenance mode" now)
 - pixelated replacement cursors?
+- Support alpha channel? [ Will be a massive performance hit since you can no longer assume that overlapping
+  cells do not have to be rendered -- you'd have to render every cell so that later renders to the same cell
+  would have something to alpha blend with.  But worth testing to see just how big of a performance hit it'll be ]
 
 DONE:
 - decide whether to use DOM event names in UI or use own names

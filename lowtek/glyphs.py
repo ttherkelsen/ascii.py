@@ -13,6 +13,7 @@
 # d - double line
 # t - thick line
 # r - round corner
+# b - block line
 # 2 - 2-dotted line
 # 3 - 3-dotted line
 # 4 - 4-dotted line
@@ -165,6 +166,26 @@ GLYPHS = {
     'B r  ': 0x2576,
     'B  r ': 0x2577,
 
+    # Diagnoal
+    'Ds ': 0x2571,
+    'D s': 0x2572,
+    'Dss': 0x2573,
+
+
+    # Block (half-size) borders
+    'B  bb': 0x2584,
+    'B  BB': 0x2587,
+    'Bbb  ': 0x2580,
+    'BBB  ': 0x2581,
+    'Bb b ': 0x258c,
+    'B b b': 0x2590,
+    'B B B': 0x258e,
+    'BB B ': 0x2589,
+    'B   b': 0x2597,
+    'B  b ': 0x2596,
+    'B b  ': 0x259d,
+    'Bb   ': 0x2598,
+
     # FIXME: Duplications for the corners of dashed lines similar to rounded LD
 
     # Drop shadows
@@ -177,4 +198,17 @@ GLYPHS = {
     'GS2': 0x2592,
     'GS3': 0x2593,
     'GS4': 0x2588,
+
+    # Cards
+    'Cs': 0x2660,
+    'CH': 0x2661,
+    'CD': 0x2662,
+    'Cc': 0x2663,
+    'CS': 0x2664,
+    'Ch': 0x2665,
+    'Cd': 0x2666,
+    'CC': 0x2667,
+
+    # Special '10' character
+    '10': 0x2469,
 }
