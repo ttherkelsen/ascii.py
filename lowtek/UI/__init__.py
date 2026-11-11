@@ -5,7 +5,7 @@ from .fill import Fill
 from .glyphpage import GlyphPage
 from .label import Label
 from .button import Button
-#from .card import Card
+from .card import Card
 from .picture import Picture
 
 class layout:
