@@ -1,0 +1,23 @@
+Concepts of Playing Card games:
+
+All groups of cards are arranged in collections.  Unless otherwise
+stated, a collection is a FIFO sequence.  A collection can be empty.
+
+Deck - a collection of cards, typically 52, shuffled and played from
+off-screen; not visible in the game until cards from the deck is
+played, usually as part of game setup.
+
+Stack - A collection of cards arranged either vertically or
+horizontally so that they overlap slightly.  Cards in a stack can be
+face up or face down.
+
+Pile - A collection of cards arranged in a single pile.  A pile can be
+face up or face down.  Only the top card is displayed.  An indicator
+of how many cards are in the pile may be displayed.
+
+Draw Pile - A special pile, face down, which can be clicked to have
+cards drawn from it.
+
+Discard Pile - A special pile, face up, into which cards are discarded
+as per the game rules.  You cannot interact with Discard Piles.
+
