@@ -24,7 +24,8 @@ class Screen:
         self.theme = theme
         self.ui = ui
         self.mouse = mouse
-        self.names = {}
+        self.dragging = None
+        self.names = {'__screen__': self}
 
         self.update_ui()
         self.update_layers(lazy=True)
@@ -78,6 +79,9 @@ class Screen:
         if self.names[cname].update(name, value, lazy):
             self.layout_required = True # FIXME: Only the panel that contained the changed component needs re-layout
 
+    def find(self, cname):
+        return self.names[cname]
+            
     def reset_mousedown_pos(self):
         self.mousedown_pos = [ None ]*len(MouseButton)
 
@@ -108,19 +112,24 @@ class Screen:
         render = False
         t = pos.to_tuple()
 
-        if self.prevcursor is not None: # FIXME: What happens if a tracked area is on the surface edge?
-            if t in self.mouse_tracking:
-                if (comp := self.mouse_tracking[t]) != self.prevcomponent:
-                    if self.prevcomponent is not None:
-                        render |= self.event_component_mouseleave(self.prevcomponent)
-                    self.prevcomponent = comp
-                    render |= self.event_component_mouseenter(self.prevcomponent)
-                render |= self.event_component_mousemove(self.prevcomponent, pos)
-            elif self.prevcomponent is not None:
-                render |= self.event_component_mouseleave(self.prevcomponent)
-                self.prevcomponent = None
+        if self.prevcursor is not None:
+            # FIXME: What happens if a tracked area is on the surface edge?
+            if self.dragging is None:
+                if t in self.mouse_tracking:
+                    if (comp := self.mouse_tracking[t]) != self.prevcomponent:
+                        if self.prevcomponent is not None:
+                            render |= self.event_component_mouseleave(self.prevcomponent)
+                        self.prevcomponent = comp
+                        render |= self.event_component_mouseenter(self.prevcomponent)
+                    render |= self.event_component_mousemove(self.prevcomponent, pos)
+                elif self.prevcomponent is not None:
+                    render |= self.event_component_mouseleave(self.prevcomponent)
+                    self.prevcomponent = None
+            else:
+                render |= self.event_component_mousedrag(self.dragging, pos)
             render |= self.event_cell_mouseleave(self.prevcursor)
         render |= self.event_cell_mouseenter(pos)
+        
         self.prevcursor = pos
 
         if render:
@@ -186,6 +195,7 @@ class Screen:
         self.cursor_pos = pos
         if self.mouse & Mouse.SHOW:
             self.draw_cursor(pos)
+
         return False
         
     def event_cell_mouseleave(self, pos, left_canvas=False):
@@ -207,17 +217,33 @@ class Screen:
         return component.mouse_enter()
 
     def event_component_mouseleave(self, component):
-        return component.mouse_exit()
+        render = False
+        if self.dragging:
+            render |= self.dragging.mouse_drag_end(forced=True)
+            self.dragging = self.dragging_hotspot = None
+        render |= component.mouse_exit()
+        return render
 
     def event_component_mousemove(self, component, pos):
         return component.mouse_over(pos)
 
     def event_component_mousedown(self, component, button):
         self.mousedown_pos[button] = component
-        return component.mouse_button_down(button, self.cursor_pos)
+        render = False
+        render |= component.mouse_button_down(button, self.cursor_pos)
+        if component.draggable and button == MouseButton.LEFT:
+            # FIXME: Should we support dragging with other buttons than the left one?
+            render |= component.mouse_drag_begin()
+            self.dragging = component
+            self.dragging_hotspot = self.cursor_pos
+
+        return render
 
     def event_component_mouseup(self, component, button):
         render = False
+        if self.dragging:
+            render |= self.dragging.mouse_drag_end()
+            self.dragging = self.dragging_hotspot = None
         if component:
             render |= component.mouse_button_up(button, self.cursor_pos)
         if self.mousedown_pos[button]:
@@ -227,7 +253,12 @@ class Screen:
                 render |= self.mousedown_pos[button].mouse_button_up(button, self.cursor_pos)
         
         return render
-    
+
+    def event_component_mousedrag(self, component, pos):
+        delta = pos - self.dragging_hotspot
+        self.dragging_hotspot = pos
+        return component.mouse_drag_move(delta)
+
     def shift_layer(self, cname, layer):
         # See FIXMEs in move()
         panel = self.names[cname]
@@ -240,8 +271,35 @@ class Screen:
             
     def move_panel(self, cname, pos, relative=True):
         # FIXME: Should this error if the found component is not a Panel (or subclass thereof)?
-        self.names[cname].move(pos, relative)
+        panel = self.names[cname]
+        
+        # Clamp position to screen dimensions
+        newpos = panel.bbox.to_position()
+        if relative:
+            newpos += pos
+        else:
+            newpos = pos
 
+        if newpos.x < 0:
+            newpos.x = 0
+        if newpos.x + panel.bbox.w >= self.size.w:
+            newpos.x = self.size.w - panel.bbox.w
+            
+        if newpos.y < 0:
+            newpos.y = 0
+        if newpos.y + panel.bbox.h >= self.size.h:
+            newpos.y = self.size.h - panel.bbox.h
+        
+        
+        self.names[cname].move(newpos, relative=False)
+
+        # FIXME: Updating only mouse tracking of affected panels
+        if self.mouse & Mouse.ENABLE:
+            self.mouse_tracking = {}
+            
+            for panel in self.ui[::-1]:
+                self.mouse_tracking = panel.get_mouse_tracking() | self.mouse_tracking
+        
         # FIXME: This could be optimised so that instead of rendering the entire component hierarchy, instead
         # we do:
         # 1 - Move bbox from old position to new position in CellGrid

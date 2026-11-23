@@ -12,6 +12,9 @@ class Cell:
     def inverse(self):
         return Cell(self.glyph, self.colours.inverse())
 
+    def update_colours(self, *colours):
+        return Cell(self.glyph, self.colours.update(*colours))
+
 def str2cells(text, colours):
     return [ Cell(t, colours) for t in text ]
 
@@ -43,7 +46,7 @@ class CellPosition:
 class CellUpdate(abc.ABC):
     def __init__(self, cells, pos=None):
         self.cells = cells
-        self.dirty = True
+        #self.dirty = True
         self.pos = pos or Position(0, 0)
 
     @property
@@ -69,6 +72,7 @@ class CellUpdate(abc.ABC):
     def iter(self):
         ... # Must be implemented in subclass
 
+
 class BBox(CellUpdate):
     def __init__(self, bbox, **cellupdate):
         super().__init__(**cellupdate)
@@ -87,21 +91,93 @@ class BBoxFill(BBox):
             for xx in range(self.bbox.w):
                 yield CellPosition(self.cells, Position(self.bbox.x + xx, self.bbox.y + yy) + self.pos)
 
-class Image(BBox):
-    def __init__(self, imagedata, palette, colours, **bbox):
+class CellCollection:
+    def __init__(self, parent, size, cells=None):
+        self.parent = parent
+        self.size = size
+        self.cells = cells or {}
+
+    def __getitem__(self, pos):
+        return self.cells[pos]
+    
+    def __setitem__(self, pos, cell):
+        self.cells[pos] = cell
+
+    def items(self):
+        return self.cells.items()
+        
+    def clone(self, parent):
+        return CellCollection(parent, self.size)
+        
+    def filter(self, frame=None):
+        cc = self.clone(self)
+        if frame:
+            ps = set()
+            for i in range(frame):
+                for x in range(self.size.w):
+                    ps.add(Position(x, i))
+                    ps.add(Position(x, self.size.h - i - 1))
+                for y in range(self.size.h):
+                    ps.add(Position(i, y))
+                    ps.add(Position(self.size.w - i - 1, y))
+            cc.cells = { pos: self[pos] for pos in ps }
+                
+        return cc
+
+    def inverse(self):
+        for pos, cell in self.items():
+            self[pos] = self[pos].inverse()
+        return self
+
+    def colour(self, *colours):
+        for pos, cell in self.items():
+            self[pos] = self[pos].update_colours(*colours)
+        return self
+
+    def apply(self):
+        obj = self
+        while True:
+            obj = obj.parent
+            if not isinstance(obj, CellCollection):
+                break
+
+        # obj is containing Grid object -- this could be expanded to all types of CellUpdate objects
+        for pos, cell in self.cells.items():
+            obj[pos] = cell
+        
+
+class Grid(CellUpdate):
+    def __init__(self, imagedata, palette, colours, **cellupdate):
         self.imagedata = imagedata
         self.palette = palette
         self.colours = colours
         super().__init__(
             cells=self.render_cells(),
-            bbox=Size(len(self.imagedata[0]), len(self.imagedata)).to_bbox(0, 0),
-            **bbox,
+            **cellupdate,
         )
 
+    def iter(self):
+        if self.dirty is True:
+            seq = self.cells.items()
+        else:
+            seq = self.dirty
+
+        for pos, cell in seq:
+            yield CellPosition(cell, pos + self.pos)
+
+    def __setitem__(self, pos, cell):
+        if self.dirty is True:
+            pass
+        elif self.dirty is False:
+            self.dirty = [ (pos, cell) ]
+        else:
+            self.dirty.append((pos, cell))
+        self.cells[pos] = cell
+
     def render_cells(self):
-        cells = []
-        for row in self.imagedata:
-            for col in row:
+        cells = CellCollection(self, Size(len(self.imagedata[0]), len(self.imagedata)))
+        for y, row in enumerate(self.imagedata):
+            for x, col in enumerate(row):
                 c = self.palette.get(col, col)
                 match c:
                     case str():
@@ -115,8 +191,10 @@ class Image(BBox):
                         cell = c
                     case _:
                         raise ValueError(f"Unknown palette type {c=}")
-                cells.append(cell)
+                cells[Position(x, y)] = cell
         return cells
+
+        
         
 class Row(CellUpdate):
     def iter(self):

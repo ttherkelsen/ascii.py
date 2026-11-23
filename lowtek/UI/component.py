@@ -18,6 +18,7 @@ class Component:
             theme     = None,             # Normally set during screen initialisation, but can be set manually
             name      = None,             # Name of the component, for easy access via Screen.update
             tracked   = None,             # Which cells are mouse tracked, see mouse_* methods below
+            draggable = False,            # Should the component response to mouse dragging?
             callbacks = None,             # Callback events (FIXME: better description)
     ):
         self.align = align
@@ -31,9 +32,11 @@ class Component:
         self.theme = theme
         self.name = name
         self.tracked = tracked
+        self.draggable = draggable
         self.callbacks = { t.name: t for t in callbacks } if callbacks is not None else {}
         
         self.cells = cell.CellUpdates()
+        self._parent = None
 
     def find(self, name):
         return self._names[name]
@@ -110,10 +113,10 @@ class Component:
     def move(self, pos, relative=True):
         self.cells.move(pos, relative)
         
-        if relative:
-            self._bbox += pos
-        else:
-            self._bbox.set_position(pos)
+        #if relative:
+        #    self._bbox += pos
+        #else:
+        #    self._bbox.set_position(pos)
             
         if self.tracked:
             self._mouse_tracking = None

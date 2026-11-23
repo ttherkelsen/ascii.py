@@ -21,7 +21,7 @@ class Picture(Component):
 
     def layout_done(self, bbox):
         bbox = super().layout_done(bbox)
-        self.cells['main'] = cell.Image(
+        self.cells['main'] = cell.Grid(
             imagedata=self.imagedata,
             palette=self.palette,
             colours=self.colours or self.theme.colours.panel_background,

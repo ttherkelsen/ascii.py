@@ -1,7 +1,7 @@
 from .picture import Picture
-from lowtek.classes import BBox, Size
+from lowtek.classes import BBox, Size, Position
 from lowtek.colours import Colours
-from lowtek.const import Cards
+from lowtek.const import Cards, MouseButton
 from lowtek.glyphs import GLYPHS
 
 CARDTEMPLATE = {
@@ -36,7 +36,7 @@ CARDTEMPLATE = {
         Cards.SPADES: Colours("#ffffffff", "#000000ff"),
         Cards.HEARTS: Colours("#ffffffff", "#ff0000ff"),
         Cards.DIAMONDS: Colours("#ffffffff", "#ff0000ff"),
-        Cards.SUIT_BACK: Colours("#ff0000ff", "#f0f0f0ff"),
+        Cards.FACEDOWN: Colours("#ff0000ff", "#f0f0f0ff"),
     },
 
     'template': [
@@ -48,7 +48,7 @@ CARDTEMPLATE = {
         '>  Wws<',
         'c-----d',
     ],
-    Cards.FACE_BACK: [
+    Cards.FACEDOWN: [
         'IEEEEEB',
         'GxxxxxH',
         'GxxxxxH',
@@ -63,15 +63,23 @@ class Card(Picture):
     def __init__(
             self, /, *,
             face,
+            movable = False,
             **component,
     ):
         self.face = face
+        self.movable = movable
+        self._highlight = False
+        self._panel_pos = None
+         
         picture = {
-            'colours': CARDTEMPLATE['colours'][face & Cards.MASK_SUIT],
+            'colours': CARDTEMPLATE['colours'][Cards.FACEDOWN] if face & Cards.MASK_FACEDOWN else CARDTEMPLATE['colours'][face & Cards.MASK_SUIT],
             'palette': {} | CARDTEMPLATE['palette'],
+            'draggable': movable,
         }
         if (face & Cards.MASK_VALUE) in CARDTEMPLATE:
             picture['imagedata'] = CARDTEMPLATE[face & Cards.MASK_VALUE]
+        elif (face & Cards.MASK_FACEDOWN):
+            picture['imagedata'] = CARDTEMPLATE[Cards.FACEDOWN]
         else:
             match face & Cards.MASK_SUIT:
                 case Cards.CLUBS:
@@ -102,4 +110,42 @@ class Card(Picture):
             picture['imagedata'] = img
                         
         super().__init__(**(component | picture))
+
+    def highlight(self, state=True):
+        if self._highlight == state:
+            return
+
+        if state:
+            self.cells['main'].cells.filter(frame=1).colour(None, "#000000ff").apply()
+        else:
+            self.cells['main'].cells.filter(frame=1).colour(None, "#a0a0a0ff").apply()
+        self._highlight = state
+
+    def mouse_enter(self):
+        if not self.movable:
+            return False
+
+        self.highlight(True)
+        return True
+
+    def mouse_drag_begin(self):
+        print("mouse_drag_begin")
+        self._panel_pos = self._parent.bbox.to_position()
+        return False
+    
+    def mouse_drag_move(self, delta):
+        self.find("__screen__").move_panel(self._parent.name, delta)
+        return False
+
+    def mouse_drag_end(self, forced=False): # If cursor moves out of screen forced=True
+        if forced:
+            self.find("__screen__").move_panel(self._parent.name, self._panel_pos, relative=False)
+        return False
+    
+    def mouse_exit(self):
+        if not self.movable:
+            return False
+        
+        self.highlight(False)
+        return True
 

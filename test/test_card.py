@@ -2,11 +2,13 @@ from lowtek.surface import Surface
 from lowtek import UI
 from lowtek.classes import BBox, Size, Position
 from lowtek.cell import Cell
-from lowtek.const import Cards
+from lowtek.const import Cards, Mouse
 
 import js, random
 
 def run(*args):
+    theme = UI.LightTheme()
+    size = Size(80, 40)
     deck = []
     for suit in (Cards.HEARTS, Cards.DIAMONDS, Cards.CLUBS, Cards.SPADES):
         for value in range(13):
@@ -17,7 +19,7 @@ def run(*args):
         UI.Panel(
             bbox = BBox(2, 2, 7, 7),
             layout = UI.layout.Absolute(),
-            children = [ UI.Card(face=Cards.BACK | Cards.STYLE_DEFAULT) ],
+            children = [ UI.Card(face = deck.pop() | Cards.FACEDOWN | Cards.STYLE_DEFAULT) ],
         ),
     ]
 
@@ -27,7 +29,15 @@ def run(*args):
             UI.Panel(
                 bbox = bbox,
                 layout = UI.layout.Absolute(),
-                children = [ UI.Card(face=deck.pop() | Cards.STYLE_DEFAULT) ],
+                name = f"panel {row}",
+                children = [
+                    UI.Card(
+                        name = f"card {row}",
+                        face = deck.pop() | Cards.STYLE_DEFAULT,
+                        movable = True,
+                        tracked = True,
+                    )
+                ],
             )
         )
         for column in range(6 - row):
@@ -36,13 +46,11 @@ def run(*args):
                 UI.Panel(
                     bbox = bbox,
                     layout = UI.layout.Absolute(),
-                    children = [ UI.Card(face=Cards.BACK | Cards.STYLE_DEFAULT) ],
+                    children = [ UI.Card(face=deck.pop() | Cards.FACEDOWN | Cards.STYLE_DEFAULT) ],
                 )
             )
             
     
-    theme = UI.LightTheme()
-    size = Size(80, 40)
     screen = UI.Screen(
         surface = Surface('canvas', 'ucs_9x15', size),
         theme = theme,
@@ -53,7 +61,11 @@ def run(*args):
                 fill = Cell(theme.background, theme.colours.background),
             ),
         ] + cards,
+        mouse = Mouse.ENABLE | Mouse.NOCONTEXT,
     )
+
     screen.render()
+    #screen.move_panel("panel 0", Position(1, 1))
+
 
 js.addEventListener('py:all-done', run)

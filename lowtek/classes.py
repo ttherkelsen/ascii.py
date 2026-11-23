@@ -261,8 +261,11 @@ class Position(Core):
         self.y = y
 
     def __str__(self):
-        return f"<Position @ {id(self)} {self.x=} {self.y=}"
+        return f"<Position @ {id(self)} {self.x=} {self.y=}>"
     __repr__ = __str__
+
+    def __hash__(self):  # FIXME: Technically this isn't allowed since we implement iadd and isub...
+        return hash((self.x, self.y))
 
     def __eq__(self, other):
         if not isinstance(other, Position):

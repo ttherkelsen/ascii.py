@@ -73,17 +73,16 @@ class Cards(IntFlag):
     JACK = 11
     QUEEN = 12
     KING = 13
-    FACE_BACK = 14
     MASK_VALUE = 2**4 - 1
 
     CLUBS = 2**4
     DIAMONDS = 2**5
     SPADES = 2**6
     HEARTS = 2**7
-    SUIT_BACK = 2**8
-    MASK_SUIT = 2**4 | 2**5 | 2**6 | 2**7 | 2**8
+    MASK_SUIT = 2**4 | 2**5 | 2**6 | 2**7
 
-    BACK = 14 + 2**8
+    FACEDOWN = 2**8
+    MASK_FACEDOWN = 2**8
     
     STYLE_DEFAULT = 2**16
     STYLE_A = 2**16

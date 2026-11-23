@@ -21,7 +21,7 @@ class Colours:
         c = Colours()
         c.colours = self.colours[::-1]
         return c
-
+    
     def update(self, *colours):
         c = list(self.colours)
         for idx, cc in enumerate(colours):

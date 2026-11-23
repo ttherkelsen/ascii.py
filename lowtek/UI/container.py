@@ -17,6 +17,8 @@ class Container(Component):
     ):
         super().__init__(**component)
         self.children = children if children is not None else []
+        for child in self.children:
+            child._parent = self
         self.layout = layout or Row()
 
     def set_name_cache(self, cache):
