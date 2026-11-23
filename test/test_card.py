@@ -16,41 +16,30 @@ def run(*args):
     random.shuffle(deck)
             
     cards = [
-        UI.Panel(
-            bbox = BBox(2, 2, 7, 7),
-            layout = UI.layout.Absolute(),
-            children = [ UI.Card(face = deck.pop() | Cards.FACEDOWN | Cards.STYLE_DEFAULT) ],
+        UI.Card(
+            pos = Position(2, 2),
+            face = deck.pop() | Cards.FACEDOWN | Cards.STYLE_DEFAULT,
         ),
     ]
 
     for row in range(7):
-        bbox = BBox(2 + (row*8), 11 + (row*2), 7, 7)
+        pos = Position(2 + (row*8), 11 + (row*2))
         cards.append(
-            UI.Panel(
-                bbox = bbox,
-                layout = UI.layout.Absolute(),
-                name = f"panel {row}",
-                children = [
-                    UI.Card(
-                        name = f"card {row}",
-                        face = deck.pop() | Cards.STYLE_DEFAULT,
-                        movable = True,
-                        tracked = True,
-                    )
-                ],
+            UI.Card(
+                pos = pos,
+                face = deck.pop() | Cards.STYLE_DEFAULT,
+                movable = True,
             )
         )
         for column in range(6 - row):
-            bbox = BBox(2 + ((row+column+1)*8), 11 + (row*2), 7, 7)
+            pos = Position(2 + ((row+column+1)*8), 11 + (row*2))
             cards.append(
-                UI.Panel(
-                    bbox = bbox,
-                    layout = UI.layout.Absolute(),
-                    children = [ UI.Card(face=deck.pop() | Cards.FACEDOWN | Cards.STYLE_DEFAULT) ],
+                UI.Card(
+                    pos = pos,
+                    face=deck.pop() | Cards.FACEDOWN | Cards.STYLE_DEFAULT,
                 )
             )
             
-    
     screen = UI.Screen(
         surface = Surface('canvas', 'ucs_9x15', size),
         theme = theme,
@@ -65,7 +54,6 @@ def run(*args):
     )
 
     screen.render()
-    #screen.move_panel("panel 0", Position(1, 1))
 
 
 js.addEventListener('py:all-done', run)

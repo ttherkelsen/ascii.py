@@ -2,6 +2,7 @@ from ..cell import CellGrid, Cell
 from ..classes import Position
 from ..const import Mouse, MouseButton
 from ..colours import Colours
+from .panel import Panel
 
 import js
 
@@ -271,7 +272,7 @@ class Screen:
             
     def move_panel(self, cname, pos, relative=True):
         # FIXME: Should this error if the found component is not a Panel (or subclass thereof)?
-        panel = self.names[cname]
+        panel = cname if isinstance(cname, Panel) else self.names[cname]
         
         # Clamp position to screen dimensions
         newpos = panel.bbox.to_position()
@@ -291,7 +292,7 @@ class Screen:
             newpos.y = self.size.h - panel.bbox.h
         
         
-        self.names[cname].move(newpos, relative=False)
+        panel.move(newpos, relative=False)
 
         # FIXME: Updating only mouse tracking of affected panels
         if self.mouse & Mouse.ENABLE:

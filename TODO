@@ -19,6 +19,7 @@ TODO:
   would have something to alpha blend with.  But worth testing to see just how big of a performance hit it'll be ]
 
 DONE:
+- Card component should inherit Panel not Picture
 - decide whether to use DOM event names in UI or use own names
   Answer: Invent own names (probably gonna regret this decision eventually)
 - user interaction framework (needed for windows, buttons, etc)

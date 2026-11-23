@@ -1,4 +1,6 @@
 from .picture import Picture
+from .panel import Panel
+from .layout.absolute import Absolute as AbsoluteLayout
 from lowtek.classes import BBox, Size, Position
 from lowtek.colours import Colours
 from lowtek.const import Cards, MouseButton
@@ -59,12 +61,13 @@ CARDTEMPLATE = {
     ],
 }
 
-class Card(Picture):
+class Card(Panel):
     def __init__(
             self, /, *,
+            pos,
             face,
             movable = False,
-            **component,
+            **panel,
     ):
         self.face = face
         self.movable = movable
@@ -74,7 +77,6 @@ class Card(Picture):
         picture = {
             'colours': CARDTEMPLATE['colours'][Cards.FACEDOWN] if face & Cards.MASK_FACEDOWN else CARDTEMPLATE['colours'][face & Cards.MASK_SUIT],
             'palette': {} | CARDTEMPLATE['palette'],
-            'draggable': movable,
         }
         if (face & Cards.MASK_VALUE) in CARDTEMPLATE:
             picture['imagedata'] = CARDTEMPLATE[face & Cards.MASK_VALUE]
@@ -108,17 +110,26 @@ class Card(Picture):
                         row = row.replace('v', 'K').replace('V', ' ').replace('w', 'K').replace('W', ' ')
                 img.append(row)
             picture['imagedata'] = img
-                        
-        super().__init__(**(component | picture))
+
+        children = [ Picture(**picture) ]
+        super().__init__(
+            bbox = BBox(pos.x, pos.y, CARDTEMPLATE['size'].w, CARDTEMPLATE['size'].h),
+            layout = AbsoluteLayout(),
+            children = children,
+            draggable = movable,
+            tracked = movable,
+            **panel,
+        )
+
 
     def highlight(self, state=True):
         if self._highlight == state:
             return
 
         if state:
-            self.cells['main'].cells.filter(frame=1).colour(None, "#000000ff").apply()
+            self.children[0].cells['main'].cells.filter(frame=1).colour(None, "#000000ff").apply()
         else:
-            self.cells['main'].cells.filter(frame=1).colour(None, "#a0a0a0ff").apply()
+            self.children[0].cells['main'].cells.filter(frame=1).colour(None, "#a0a0a0ff").apply()
         self._highlight = state
 
     def mouse_enter(self):
@@ -129,17 +140,16 @@ class Card(Picture):
         return True
 
     def mouse_drag_begin(self):
-        print("mouse_drag_begin")
-        self._panel_pos = self._parent.bbox.to_position()
+        self._start_pos = self.bbox.to_position()
         return False
     
     def mouse_drag_move(self, delta):
-        self.find("__screen__").move_panel(self._parent.name, delta)
+        self.find("__screen__").move_panel(self, delta)
         return False
 
     def mouse_drag_end(self, forced=False): # If cursor moves out of screen forced=True
         if forced:
-            self.find("__screen__").move_panel(self._parent.name, self._panel_pos, relative=False)
+            self.find("__screen__").move_panel(self, self._start_pos, relative=False)
         return False
     
     def mouse_exit(self):
